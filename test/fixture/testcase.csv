@@ -1,0 +1,3 @@
+open,input query,submit,open,assert
+https://www.google.co.jp/,github,,http://github.com/,should be display github page
+https://www.google.co.jp/,sideroad secret,,http://github.com/,should be display sideroad secret page

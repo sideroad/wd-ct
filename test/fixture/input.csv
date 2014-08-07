@@ -1,0 +1,3 @@
+open,,get('{{val}}')
+input query,,elementByCss('#lst-ib').type('{{val}}')
+submit,,elementByCss('[name="btnK"]').click()

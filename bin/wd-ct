@@ -1,0 +1,62 @@
+#!/usr/bin/env node
+
+// Run WdCT.
+var fs = require('fs'),
+  opts = require('opts'),
+  options = {
+      "url":"src",
+      "dist" : "dist",
+      "js" : {
+          "compressor" : "yui-js",
+          "ignore":[],
+          "inline":true,
+          "root" : "src"
+      },
+      "backgroundImage" : {
+          "base64" : true
+      },
+      "css" : {
+          "compressor" : "yui-css",
+          "ignore":[],
+          "inline":true,
+          "root" : "src"
+      },
+      "image" : {
+          "base64" : true,
+          "root" : "src"
+      },
+      "logLevel" : 3
+  };
+
+opts.parse([
+  {
+    'short': 't',
+    'long': 'testcase',
+    'description': 'Target testcase file',
+    'value': true,
+    'required': true
+  },
+  {
+    'short': 'i',
+    'long': 'input',
+    'description': 'Target input file',
+    'value': true,
+    'required': true
+  },
+  {
+    'short': 'a',
+    'long': 'assertion',
+    'description': 'Target assertion file',
+    'value': true,
+    'required': true
+  },
+]);
+
+if( opts.get('testcase') ){
+  options.testcase = opts.get('testcase');
+  options.input = opts.get('input');
+  options.assertion = opts.get('assertion');
+}
+
+var WdCT = require('../index');
+new WdCT( options );
