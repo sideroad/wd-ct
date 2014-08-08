@@ -10,12 +10,15 @@
 
   var async = require('async'),
       spawn = require('simple-spawn').spawn,
-      jsdom = require('jsdom'),
       path = require('path'),
       url = require('url'),
       fs = require('fs'),
       _ = require('lodash'),
       Q = require('q'),
+      wd = require('wd'),
+      chai = require("chai"),
+      chaiAsPromised = require("chai-as-promised"),
+      csv = require("fast-csv"),
       Handlebars = require('handlebars'),
       webdriver = require('wd/lib/webdriver'),
       jquery = fs.readFileSync( path.join( __dirname, '/lib/jquery-1.9.1.min.js' ), 'utf8').toString(),
@@ -115,7 +118,6 @@
           console.log(data.replace(/\n$/,''));
           fs.appendFileSync(log, data);
         } : function(){},
-        wd = require('wd'),
         testcase,
         input,
         assertion,
@@ -148,9 +150,6 @@
 
       async.mapSeries( options.browsers, function(browserName, callback){
         var promise,
-            chai = require("chai"),
-            chaiAsPromised = require("chai-as-promised"),
-            csv = require("fast-csv"),
             interation = {
               defaults: {},
               specified: {},
