@@ -1,29 +1,54 @@
 # WebDriver for combitorial testing
 
 ## Install
+
 ```sh
 npm install -g wd-ct
-wd-ct -i input.csv -a assertion.csv -t testcase.csv
+wd-ct -i interaction.js -t testcase.csv
 ```
 
 ### CSV
-#### input.csv
-Define input interation of wd
-```csv
-open,,get('{{val}}')
-input query,,elementByCss('#lst-ib').type('{{val}}')
-submit,,elementByCss('[name="btnK"]').click()
-```
 
-#### assertion.csv
-Define input assertion of wd
-```csv
-should be display github page,"waitForElementByCss('a[href=""https://github.com/""]', 1000).should.be.fulfilled"
-should be display sideroad secret page,"waitForElementByCss('a[href=""http://sideroad.secret.jp/""]').should.be.fulfilled"
+#### interaction.js
+
+Define input and assert interations
+
+```js
+module.exports = function(){
+	return {
+		input: {
+			"open": function(b, url){
+				return b.get(url);
+			},
+			"input query": function(b, str){
+				return b.elementByCss('#lst-ib').type(str);
+			},
+			"submit": function(b){
+				return b.elementByCss('[name="btnK"]').click();
+			},
+			"store date": function(b){
+				return b.storeEval('timestamp','+new Date()');
+			},
+			"alert": function(b, val, store){
+				return b.execute('alert('+store.timestamp+')');
+			}
+		},
+		assertion: {
+			"should be display github page": function(b){
+				return b.waitForElementByCss('a[href=\"https://github.com/\"]', 1000).should.be.fulfilled;
+			},
+			"should be display sideroad secret page": function(b){
+				return b.waitForElementByCss('a[href="http://sideroad.secret.jp/"]').should.be.fulfilled;
+			}
+		}
+	};
+};
 ```
 
 #### testcase.csv
+
 Define testcase. Write input pattern and assertion.
+
 ```csv
 open,input query,submit,open,assert
 https://www.google.co.jp/,github,,http://github.com/,should be display github page
