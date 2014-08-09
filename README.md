@@ -7,7 +7,8 @@ npm install -g wd-ct
 wd-ct -i interaction.js -t testcase.csv
 ```
 
-### CSV
+### Usage
+Prepare interaction.js and testcase.csv following below.
 
 #### interaction.js
 
