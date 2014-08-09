@@ -20,21 +20,36 @@ opts.parse([
     'required': true
   },
   {
-    'short': 'd',
-    'long': 'debug',
-    'description': 'Debug mode',
+    'short': 'nl',
+    'long': 'no-logging',
+    'description': 'Not output logging',
   },
   {
     'short': 'b',
     'long': 'browsers',
     'description': 'Browser',
     'value': true
+  },
+  {
+    'short': 'nc',
+    'long': 'no-color',
+    'description': 'Not apply color to console',
   }
 ]);
 
+
 options.testcase = opts.get('testcase');
 options.interaction = opts.get('interaction');
-options.debug = opts.get('debug') ? true: false;
+
+var noLogging = opts.get('no-logging');
+if(noLogging) {
+  options.debug = false;
+}
+
+var noColor = opts.get('no-color');
+if(noColor) {
+  options.color = false;
+}
 
 var browsers = opts.get('browsers');
 if(browsers){
