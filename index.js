@@ -33,6 +33,7 @@
       startURL,
       htmlpath,
       key,
+      store,
       getDriverOptions = function(){
         var options = [],
             base = path.join( __dirname,'lib' );
@@ -108,6 +109,19 @@
     };
     poll();
   };
+
+  // adding custom promise chain method
+  wd.addPromiseChainMethod(
+    'store',
+    function(key, source) {
+      return this
+        .execute(source)
+        .then(function(results){
+          store[key] = results;
+          console.log(arguments);
+        });
+    }
+  );
 
   var WdCT = function(options){
     var child,
@@ -250,23 +264,25 @@
                   var val = data[index],
                       template, 
                       source;
-                  
+                  console.log(key, index, order.length, row, interation.defaults[key]);
                   obj[key] = val;
-                  template = (index +1 === order.length) ? interation.assert[assert[row]] :
+                  template = (index === order.length) ? interation.assert[assert[row]] :
                              (interation.specified[val]) ? interation.specified[val][key] : 
                               interation.defaults[key];
 
-                  source = (index +1 === order.length) ? obj : {val: val};
-                  queue.push(Handlebars.compile(template)(source));
+                  source = (index === order.length) ? obj : {val: val};
+                  queue.push('.then(function(){return browser.'+Handlebars.compile(template)(source)+';})');
                 });
               })
               .on("end", function(){
-
-                var exec = +new Date() + '.js';
-                fs.writeFileSync( exec, 'module.exports=function(browser){\n'+
-                                        '  return browser.'+queue.join('\n    .')+';\n'+
+                store = {};
+                var test = __dirname +'/'+ new Date().getTime() + '.js';
+                fs.writeFileSync( test, 'module.exports=function(browser, store){\n'+
+                                        '  return browser'+
+                                        queue.join('\n                ')+';\n'+
                                         '};');
-                promise = require('./'+exec)(promise);
+                promise = require(test)(promise, store);
+                // fs.unlinkSync(test);
                 callback();
               });
           }
