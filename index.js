@@ -11,44 +11,33 @@
   var async = require('async'),
       spawn = require('simple-spawn').spawn,
       path = require('path'),
-      url = require('url'),
       fs = require('fs'),
       _ = require('lodash'),
-      Q = require('q'),
       wd = require('wd'),
       chai = require("chai"),
       chaiAsPromised = require("chai-as-promised"),
       csv = require("fast-csv"),
-      Handlebars = require('handlebars'),
+      spawn = require("simple-spawn").spawn,
       webdriver = require('wd/lib/webdriver'),
-      jquery = fs.readFileSync( path.join( __dirname, '/lib/jquery-1.9.1.min.js' ), 'utf8').toString(),
       seleniumjar = __dirname+'/lib/selenium-server-standalone-2.42.2.jar',
       fireEvents = fs.readFileSync( path.join( __dirname, '/lib/fire-events.js'), 'utf8').toString(),
-      searchOption = fs.readFileSync( path.join( __dirname, '/lib/search-option.js'), 'utf8').toString(),
-      searchIframe = fs.readFileSync( path.join( __dirname, '/lib/search-iframe.js'), 'utf8').toString(),
       browser,
-      storedVars = {},
-      timeout,
-      sendEscapeAfterType,
-      startURL,
-      htmlpath,
-      key,
-      store,
+      store = {},
       getDriverOptions = function(){
-        var options = [],
+        var args = [],
             base = path.join( __dirname,'lib' );
 
         //webdriver.ie.driver
-        options.push( process.platform !== 'win32' ? '' : 
+        args.push( process.platform !== 'win32' ? '' : 
                       process.config.variables.host_arch === 'x64' ? '-Dwebdriver.ie.driver='+ base + path.sep + 'IEDriverServer.x64.exe' :
                                                                      '-Dwebdriver.ie.driver='+ base + path.sep + 'IEDriverServer.x86.exe' );
 
         //weddriver.chrome.driver
-        options.push( process.platform === 'darwin' ? '-Dwebdriver.chrome.driver='+ base + path.sep + 'mac.chromedriver' :
+        args.push( process.platform === 'darwin' ? '-Dwebdriver.chrome.driver='+ base + path.sep + 'mac.chromedriver' :
                       process.platform === 'win32'  ? '-Dwebdriver.chrome.driver='+ base + path.sep + 'chromedriver.exe' :
                       process.platform === 'linux'  && (process.config.variables.host_arch === 'x64') ? '-Dwebdriver.chrome.driver='+ base + path.sep + 'linux64.chromedriver' :
                       process.platform === 'linux'  && (process.config.variables.host_arch === 'x32') ? '-Dwebdriver.chrome.driver='+ base + path.sep + 'linux32.chromedriver' : '');
-        return ' '+options.join(' ');
+        return ' '+args.join(' ');
       };
 
   // monkey patching
@@ -112,65 +101,71 @@
 
   // adding custom promise chain method
   wd.addPromiseChainMethod(
-    'store',
+    'storeEval',
     function(key, source) {
       return this
-        .execute(source)
+        .eval(source)
         .then(function(results){
           store[key] = results;
-          console.log(arguments);
+        });
+    }
+  );
+  wd.addPromiseChainMethod(
+    'fireEvents',
+    function(css, eventName) {
+      var that = this;
+      return this
+        .elementByCss(css)
+        .then(function(el){
+          console.log(el);
+          return that.execute(fireEvents, el, eventName);
         });
     }
   );
 
   var WdCT = function(options){
     var child,
-        that = this,
-        log = options.log,
-        logging = log ? function(data){
-          data = ''+data;
-          console.log(data.replace(/\n$/,''));
-          fs.appendFileSync(log, data);
-        } : function(){},
+        debug,
         testcase,
-        input,
-        assertion,
-        assert = [];
+        interaction;
 
     options = _.extend({
       browsers: ['firefox'],
       timeout: 10000,
       force: false,
-      sendEscapeAfterType: true
+      sendEscapeAfterType: true,
+      testcase: 'testcase.csv',
+      interaction: 'interaction.csv',
+      debug: false,
+      proxy: undefined
     }, options);
 
     testcase = options.testcase;
-    input = options.input;
-    assertion = options.assertion;
+    interaction = options.interaction;
+    debug = options.debug ? function(){
+      console.log.apply(console.log, arguments);
+    } : function(){};
 
     console.log('Setup Selenium Server...');
     child = spawn('java -jar ' + seleniumjar + getDriverOptions());
 
     child.stderr.on('data', function(data){
-      logging(data);
+      data = typeof data === "string" ? data : ''+data;
+      debug(data.replace(/\n$/,''));
     });
 
     child.stdout.on('data', function(data){
-      data = ''+data;
-      logging(data);
+      data = typeof data === "string" ? data : ''+data;
+      debug(data.replace(/\n$/,''));
       if( !data.match('Started org.openqa.jetty.jetty.Server') ) {
         return;
       }
 
       async.mapSeries( options.browsers, function(browserName, callback){
         var promise,
-            interation = {
-              defaults: {},
-              specified: {},
-              assert: {}
-            },
-            queue = [],
-            order = [];
+            order = [],
+            assert = [],
+            commands;
 
         console.log('Setup browser ['+browserName+']');
         chai.use(chaiAsPromised);
@@ -180,71 +175,37 @@
         browser = wd.promiseChainRemote();
         // optional extra logging
         browser.on('status', function(info) {
-          console.log(info.cyan);
+          debug(info.cyan);
         });
         browser.on('command', function(eventType, command, response) {
-          console.log(' > ', command, (response || ''));
+          debug(' > ', command, (response || ''));
         });
         browser.on('http', function(meth, path, data) {
-          console.log(' > ', path, (data || ''));
+          debug(' > ', path, (data || ''));
         });
 
         promise = browser.init({
           browserName: browserName,
           name: 'This is an example test',
-          proxy: options.proxy || undefined
+          proxy: options.proxy
         });
-        timeout = options.timeout;
-        htmlpath = options.source;
-        startURL = options.startURL;
-        sendEscapeAfterType = options.sendEscapeAfterType;
 
         console.log('  Running testcase['+testcase+']');
 
         async.waterfall([
-          function(callback){
-            csv
-              .fromPath(input)
-              .on("record", function(data, row){
-                var key = data.shift(),
-                    val = data.shift(),
-                    commands = data.shift();
-
-                if(val === ""){
-                  interation.defaults[key] = commands;
-                } else {
-                  if(!interation.specified[val]) {
-                    interation.specified[val] = {};
-                  }
-                  interation.specified[val][key] = commands;
-                }
-              })
-              .on("end", function(){
-                callback();
-              });
-          },
-          function(callback){
-            csv
-              .fromPath(assertion)
-              .on("record", function(data, row){
-                var key = data.shift(),
-                    commands = data.shift();
-
-                interation.assert[key] = commands;
-              })
-              .on("end", function(){
-                callback();
-              });
+          function registerInteraction(callback){
+            commands = require(__dirname + '/' + interaction)();
+            callback();
           },
           function getOrderTestCase(callback){
             csv
               .fromPath(testcase)
               .on("record", function(data, row){
-                var commands = data.pop();
+                var command = data.pop();
                 if(row === 0){
                   order = data;
                 } else {
-                  assert[row] = commands;
+                  assert[row] = command;
                 }
               })
               .on("end", function(){
@@ -255,39 +216,32 @@
             csv
               .fromPath(testcase)
               .on("record", function(data, row){
-                var obj = {};
+
+                // Column row should be ignore
                 if(row === 0){
                   return;
                 }
 
                 order.forEach(function(key, index){
                   var val = data[index],
-                      template, 
-                      source;
-                  console.log(key, index, order.length, row, interation.defaults[key]);
-                  obj[key] = val;
-                  template = (index === order.length) ? interation.assert[assert[row]] :
-                             (interation.specified[val]) ? interation.specified[val][key] : 
-                              interation.defaults[key];
+                      command = (index+1 === order.length) ? commands.assertion[assert[row]] :
+                                                             commands.input[key];
 
-                  source = (index === order.length) ? obj : {val: val};
-                  queue.push('.then(function(){return browser.'+Handlebars.compile(template)(source)+';})');
+                  promise = (function(command, val){
+                    return promise.then(function(){
+                      return command(browser, val, store);
+                    }, function(e){
+                      throw new Error(e);
+                    });
+                  })(command, val);
                 });
               })
               .on("end", function(){
-                store = {};
-                var test = __dirname +'/'+ new Date().getTime() + '.js';
-                fs.writeFileSync( test, 'module.exports=function(browser, store){\n'+
-                                        '  return browser'+
-                                        queue.join('\n                ')+';\n'+
-                                        '};');
-                promise = require(test)(promise, store);
-                // fs.unlinkSync(test);
-                callback();
+                  callback();
               });
           }
         ], function(){
-          promise = promise.then(function(){
+          promise.then(function(){
             console.log('Teardown browser ['+browserName+']');
             return browser.quit();
           },function(e){

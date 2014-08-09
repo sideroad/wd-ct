@@ -1,7 +1,7 @@
 {
   "name": "wd-ct",
   "description": "Run WebDriver for combinatorial testing",
-  "version": "0.0.3",
+  "version": "1.0.0",
   "homepage": "https://github.com/sideroad/wd-ct",
   "author": {
     "name": "sideroad",
@@ -34,18 +34,16 @@
     "chai": "^1.9.1",
     "chai-as-promised": "^4.1.1",
     "fast-csv": "^0.4.2",
-    "handlebars": "^2.0.0-alpha.4",
     "lodash": "~1.3.1",
     "opts": "^1.2.2",
     "q": "0.9.x",
-    "simple-spawn": "~0.0.2",
+    "simple-spawn": "0.0.2",
     "wd": "^0.3.4"
   },
   "devDependencies": {
-    "mocha": "~1.8.1"    
+    "mocha": "~1.8.1"
   },
-  "peerDependencies": {
-  },
+  "peerDependencies": {},
   "keywords": [
     "wd",
     "webdriver",

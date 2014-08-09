@@ -1,2 +1,0 @@
-should be display github page,"waitForElementByCss('a[href=""https://github.com/""]', 1000).should.be.fulfilled"
-should be display sideroad secret page,"waitForElementByCss('a[href=""http://sideroad.secret.jp/""]').should.be.fulfilled"

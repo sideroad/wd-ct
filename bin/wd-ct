@@ -1,32 +1,8 @@
 #!/usr/bin/env node
 
 // Run WdCT.
-var fs = require('fs'),
-  opts = require('opts'),
-  options = {
-      "url":"src",
-      "dist" : "dist",
-      "js" : {
-          "compressor" : "yui-js",
-          "ignore":[],
-          "inline":true,
-          "root" : "src"
-      },
-      "backgroundImage" : {
-          "base64" : true
-      },
-      "css" : {
-          "compressor" : "yui-css",
-          "ignore":[],
-          "inline":true,
-          "root" : "src"
-      },
-      "image" : {
-          "base64" : true,
-          "root" : "src"
-      },
-      "logLevel" : 3
-  };
+var opts = require('opts'),
+    options = {};
 
 opts.parse([
   {
@@ -38,24 +14,31 @@ opts.parse([
   },
   {
     'short': 'i',
-    'long': 'input',
-    'description': 'Target input file',
+    'long': 'interaction',
+    'description': 'Target interaction file',
     'value': true,
     'required': true
   },
   {
-    'short': 'a',
-    'long': 'assertion',
-    'description': 'Target assertion file',
-    'value': true,
-    'required': true
+    'short': 'd',
+    'long': 'debug',
+    'description': 'Debug mode',
   },
+  {
+    'short': 'b',
+    'long': 'browsers',
+    'description': 'Browser',
+    'value': true
+  }
 ]);
 
-if( opts.get('testcase') ){
-  options.testcase = opts.get('testcase');
-  options.input = opts.get('input');
-  options.assertion = opts.get('assertion');
+options.testcase = opts.get('testcase');
+options.interaction = opts.get('interaction');
+options.debug = opts.get('debug') ? true: false;
+
+var browsers = opts.get('browsers');
+if(browsers){
+  options.browsers =  browsers.split(',');
 }
 
 var WdCT = require('../index');
