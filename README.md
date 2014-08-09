@@ -55,7 +55,7 @@ https://www.google.co.jp/,github,,http://github.com/,should be display github pa
 https://www.google.co.jp/,sideroad secret,,http://github.com/,should be display sideroad secret page
 ```
 
-After preparation, execute wd-ct
+After preparation, execute `wd-ct`
 ```sh
 $ wd-ct -i interaction.js -t testcase.csv
 ```
