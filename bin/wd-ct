@@ -56,5 +56,5 @@ if(browsers){
   options.browsers =  browsers.split(',');
 }
 
-var WdCT = require('../index');
+var WdCT = require('../lib/wd-ct');
 new WdCT( options );
