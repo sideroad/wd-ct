@@ -126,17 +126,17 @@
   var WdCT = function(options){
     var child,
         debug,
+        error,
         testcase,
         interaction;
 
     options = _.extend({
       browsers: ['firefox'],
-      timeout: 10000,
-      force: false,
-      sendEscapeAfterType: true,
       testcase: 'testcase.csv',
       interaction: 'interaction.csv',
-      debug: false,
+      color: true,
+      debug: true,
+      error: true,
       proxy: undefined
     }, options);
 
@@ -145,18 +145,36 @@
     debug = options.debug ? function(){
       console.log.apply(console.log, arguments);
     } : function(){};
+    error = options.error ? function(){
+      console.error.apply(console.error, arguments);
+    } : function(){};
 
-    console.log('Setup Selenium Server...');
+
+    //Apply colors to console.log
+    var colors = require('colors');
+    if(!options.color){
+
+      // Geld colors
+      _.map( colors, function(val, key){
+        if( typeof val === 'function' ){
+          String.prototype.__defineGetter__(key, function(){
+            return this;
+          });
+        }
+      });
+    }
+
+    debug('Setup Selenium Server...'.grey);
     child = spawn('java -jar ' + seleniumjar + getDriverOptions());
 
     child.stderr.on('data', function(data){
       data = typeof data === "string" ? data : ''+data;
-      debug(data.replace(/\n$/,''));
+      debug(data.replace(/\n$/,'').grey);
     });
 
     child.stdout.on('data', function(data){
       data = typeof data === "string" ? data : ''+data;
-      debug(data.replace(/\n$/,''));
+      debug(data.replace(/\n$/,'').grey);
       if( !data.match('Started org.openqa.jetty.jetty.Server') ) {
         return;
       }
@@ -167,7 +185,7 @@
             assert = [],
             commands;
 
-        console.log('Setup browser ['+browserName+']');
+        debug(('Setup browser ['+browserName+']').grey);
         chai.use(chaiAsPromised);
         chai.should();
         chaiAsPromised.transferPromiseness = wd.transferPromiseness;
@@ -178,10 +196,10 @@
           debug(info.cyan);
         });
         browser.on('command', function(eventType, command, response) {
-          debug(' > ', command, (response || ''));
+          debug(' > ', command.green, (response || '').magenta);
         });
         browser.on('http', function(meth, path, data) {
-          debug(' > ', path, (data || ''));
+          debug(' > ', path.yellow, (data || '').magenta);
         });
 
         promise = browser.init({
@@ -190,7 +208,7 @@
           proxy: options.proxy
         });
 
-        console.log('  Running testcase['+testcase+']');
+        debug(('  Running testcase['+testcase+']').grey);
 
         async.waterfall([
           function registerInteraction(callback){
@@ -242,11 +260,11 @@
           }
         ], function(){
           promise.then(function(){
-            console.log('Teardown browser ['+browserName+']');
+            debug(('Teardown browser ['+browserName+']').grey);
             return browser.quit();
           },function(e){
-            console.error(e);
-            console.log('Teardown browser ['+browserName+']');
+            error(e.red);
+            debug(('Teardown browser ['+browserName+']').grey);
             return browser.quit();
           }).fin(function(){
             callback(null);
