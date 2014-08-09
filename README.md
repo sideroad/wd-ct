@@ -3,8 +3,7 @@
 ## Install
 
 ```sh
-npm install -g wd-ct
-wd-ct -i interaction.js -t testcase.csv
+$ npm install -g wd-ct
 ```
 
 ### Usage
@@ -54,4 +53,9 @@ Define testcase. Write input pattern and assertion.
 open,input query,submit,open,assert
 https://www.google.co.jp/,github,,http://github.com/,should be display github page
 https://www.google.co.jp/,sideroad secret,,http://github.com/,should be display sideroad secret page
+```
+
+After preparation, execute wd-ct
+```sh
+$ wd-ct -i interaction.js -t testcase.csv
 ```
