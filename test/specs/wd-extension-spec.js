@@ -33,7 +33,7 @@
         describe('waitForNoElement', function () {
             it('should wait for element not present', function (done) {
             	var b = wd.promiseChainRemote();
-            	b.init({browser: 'phantomjs'})
+            	b.init({browserName: 'phantomjs'})
     	    	 .get('http://localhost:8000/')
             	 .elementByCss('#will-be-vanish')
             	 .waitForNoElement('#will-be-vanish')
@@ -47,7 +47,7 @@
         describe('waitForNotVisible', function () {
             it('should wait for element disappear', function (done) {
             	var b = wd.promiseChainRemote();
-            	b.init({browser: 'phantomjs'})
+            	b.init({browserName: 'phantomjs'})
     	    	 .get('http://localhost:8000/')
             	 .elementByCss('#will-be-disappear')
             	 .waitForNotVisible('#will-be-disappear')
@@ -69,7 +69,7 @@
         describe('storeEval', function () {
             it('should store executed script', function (done) {
             	var b = wd.promiseChainRemote();
-            	b.init({browser: 'phantomjs'})
+            	b.init({browserName: 'phantomjs'})
     	    	 .get('http://localhost:8000/')
             	 .storeEval('location', 'location.href')
             	 .then(function(){
@@ -83,7 +83,7 @@
         describe('fireEvents', function () {
             it('should emit events', function (done) {
             	var b = wd.promiseChainRemote();
-            	b.init({browser: 'phantomjs'})
+            	b.init({browserName: 'phantomjs'})
     	    	 .get('http://localhost:8000/')
     	    	 .elementByCss('#text')
     	    	 .type('abcde')
