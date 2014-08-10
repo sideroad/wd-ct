@@ -38,6 +38,7 @@ module.exports = function(){
           if(data.match('Selenium is already running on port')) {
             child.kill();
             server.port++;
+            console.log('      reallocating port with '+server.port);
             child = spawn('java -jar ' + seleniumjar + getDriverOptions(server.port));
             addEvent(child);
           }
