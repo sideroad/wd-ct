@@ -1,4 +1,4 @@
-# WebDriver for combitorial testing
+# WebDriver for combitorial testing[![Coverage Status](https://coveralls.io/repos/sideroad/wd-ct/badge.png?branch=master)](https://coveralls.io/r/sideroad/wd-ct?branch=master)
 
 ## Install
 

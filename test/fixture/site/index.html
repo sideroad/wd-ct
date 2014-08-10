@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script type="text/javascript" src='http://code.jquery.com/jquery-2.1.1.min.js'></script>
+	<title>Wd-CT</title>
+</head>
+<body>
+	<div id="logger"></div>
+	<input type="text" id="text" value="" onchange="$('#logger').text(this.value)">
+	<input type="button" id="button" onclick="$('#logger').text('clicked button')" value="Button" >
+	<input type="button" id="will-be-vanish" onclick="$(this).remove()" value="WillBeVanish" >
+	<input type="button" id="will-be-disappear" onclick="$(this).hide()" value="WillBeDisappear" >
+</body>
+</html>
