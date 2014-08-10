@@ -1,4 +1,4 @@
-# WebDriver for combitorial testing[![Coverage Status](https://coveralls.io/repos/sideroad/wd-ct/badge.png?branch=master)](https://coveralls.io/r/sideroad/wd-ct?branch=master)
+# WebDriver for combitorial testing[![Build Status](https://travis-ci.org/sideroad/wd-ct.svg?branch=master)](https://travis-ci.org/sideroad/wd-ct) [![Coverage Status](https://coveralls.io/repos/sideroad/wd-ct/badge.png?branch=master)](https://coveralls.io/r/sideroad/wd-ct?branch=master)
 
 ## Install
 
