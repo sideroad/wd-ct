@@ -4,6 +4,7 @@
 
 ```sh
 $ npm install -g wd-ct
+$ wd-ct -s
 ```
 
 ### Usage
@@ -14,31 +15,35 @@ Prepare interaction.js and testcase.csv following below.
 Define input and assert interations
 
 ```js
-module.exports = function(){
+module.exports = function(wd){
+	'use strict';
 	return {
 		input: {
-			"open": function(b, url){
+			'open': function(b, url){
 				return b.get(url);
 			},
-			"input query": function(b, str){
-				return b.elementByCss('#lst-ib').type(str);
+			'input query': function(b, str){
+				return b.waitForElementByCss('#js-command-bar-field')
+				        .type(str)
+				        .fireEvents('#js-command-bar-field', 'change')
+				        .elementByCss('#top_search_form')
+				        .submit();
 			},
-			"submit": function(b){
-				return b.elementByCss('[name="btnK"]').click();
+			'click user menu': function(b){
+				return b.waitForElementByCss('.search-menu-container ul.menu li:nth-of-type(4) a')
+				        .click();
 			},
-			"store date": function(b){
-				return b.storeEval('timestamp','+new Date()');
-			},
-			"alert": function(b, val, store){
-				return b.execute('alert('+store.timestamp+')');
+			'click linkage': function(b, href){
+                return b.waitForElementByCss('a[href="'+href+'"]')
+                        .click();
 			}
 		},
 		assertion: {
-			"should be display github page": function(b){
-				return b.waitForElementByCss('a[href=\"https://github.com/\"]', 1000).should.be.fulfilled;
+			'should be display sideroad github page': function(b){
+				return b.eval('window.location.href').should.eventually.equal('https://github.com/sideroad');
 			},
-			"should be display sideroad secret page": function(b){
-				return b.waitForElementByCss('a[href="http://sideroad.secret.jp/"]').should.be.fulfilled;
+			'should be display gruntjs github page': function(b){
+				return b.eval('window.location.href').should.eventually.equal('https://github.com/gruntjs');
 			}
 		}
 	};
@@ -50,9 +55,9 @@ module.exports = function(){
 Define testcase. Write input pattern and assertion.
 
 ```csv
-open,input query,submit,open,assert
-https://www.google.co.jp/,github,,http://github.com/,should be display github page
-https://www.google.co.jp/,sideroad secret,,http://github.com/,should be display sideroad secret page
+open,input query,click user menu,click linkage,assert
+https://github.com/,sideroad,,/sideroad,should be display sideroad github page
+https://github.com/,gruntjs,,/gruntjs,should be display gruntjs github page
 ```
 
 After preparation, execute `wd-ct`

@@ -42,7 +42,7 @@ var WdCT = function(options){
     console.log.apply(console.log, arguments);
   } : function(){};
   error = options.error ? function(){
-    console.error.apply(console.error, arguments);
+    console.log.apply(console.log, arguments);
   } : function(){};
 
   // Apply wd-extension
@@ -109,47 +109,34 @@ var WdCT = function(options){
           commands = require(process.cwd()+'/'+interaction)(wd);
           callback();
         },
-        function getOrderTestCase(callback){
-          csv
-            .fromPath(testcase)
-            .on("record", function(data, row){
-              var command = data.pop();
-              if(row === 0){
-                // get input and assertion order from columns
-                order = data;
-              } else {
-                // set assertion row number
-                assert[row] = command;
-              }
-            })
-            .on("end", function(){
-              callback();
-            });
-        },
         function queuingTestCase(callback){
           csv
             .fromPath(testcase)
             .on("record", function(data, row){
-              var assertCol = order.length;
+              var queue = function(command, val){
+                    promise = promise.then(function(){
+                      return command(browser, val, store);
+                    }, function(e){
+                      throw e;
+                    });
+                  },
+                  assert = data.pop();
 
               // Header should be ignore
               if(row === 0){
+                order = data;
                 return;
               }
 
+              // queuing input interaction
               order.forEach(function(key, index){
-                var val = data[index],
-                    command = (index + 1 === assertCol) ? commands.assertion[assert[row]] :
-                                                           commands.input[key];
-
-                promise = (function(command, val){
-                  return promise.then(function(){
-                    return command(browser, val, store);
-                  }, function(e){
-                    throw new Error(e);
-                  });
-                })(command, val);
+                var val = data[index];
+                queue( commands.input[key], val);
               });
+
+              // queuing assertion interaction
+              queue( commands.assertion[assert] );
+
             })
             .on("end", function(){
                 callback();
@@ -160,7 +147,7 @@ var WdCT = function(options){
           debug(('Teardown browser ['+browserName+']').grey);
           return browser.quit();
         },function(e){
-          error(e.red);
+          error(e.message.red);
           debug(('Teardown browser ['+browserName+']').grey);
           return browser.quit();
         }).fin(function(){
