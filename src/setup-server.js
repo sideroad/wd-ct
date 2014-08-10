@@ -5,6 +5,7 @@
 var spawn = require('simple-spawn').spawn,
     path = require('path'),
     seleniumjar = __dirname+'/../vendor/selenium-server-standalone-2.42.2.jar',
+    port = 4444,
     getDriverOptions = function(){
       var args = [],
           base = path.join( __dirname,'/../vendor/' );
@@ -19,30 +20,44 @@ var spawn = require('simple-spawn').spawn,
                     process.platform === 'win32'  ? '-Dwebdriver.chrome.driver='+ base + path.sep + 'chromedriver.exe' :
                     process.platform === 'linux'  && (process.config.variables.host_arch === 'x64') ? '-Dwebdriver.chrome.driver='+ base + path.sep + 'linux64.chromedriver' :
                     process.platform === 'linux'  && (process.config.variables.host_arch === 'x32') ? '-Dwebdriver.chrome.driver='+ base + path.sep + 'linux32.chromedriver' : '');
+
+      args.push('-port '+port);
       return ' '+args.join(' ');
     };
 
 
 module.exports = function(){
-  var child = spawn('java -jar ' + seleniumjar + getDriverOptions());
+  var child = spawn('java -jar ' + seleniumjar + getDriverOptions()),
+      EventEmitter = require('events').EventEmitter,
+      server = new EventEmitter(),
+      addEvent = function(child){
+        server.pid = child.pid;
+        child.stderr.on('data', function(data){
+          data = typeof data === "string" ? data : ''+data;
+          server.emit('data', data.replace(/\n$/, ''));
+          if(data.match('Selenium is already running on port')) {
+            child.kill();
+            port++;
+            child = spawn('java -jar ' + seleniumjar + getDriverOptions());
+            addEvent(child);
+          }
+        });
 
-  child.stderr.on('data', function(data){
-    data = typeof data === "string" ? data : ''+data;
-    child.emit('data', data.replace(/\n$/, ''));
-    if(data.match('Selenium is already running on port')) {
-      child.emit('start');
-    }
+        child.stdout.on('data', function(data){
+          data = typeof data === "string" ? data : ''+data;
+          server.emit('data', data.replace(/\n$/,''));
 
-  });
+          if(data.match('Started org.openqa.jetty.jetty.Server')) {
+            server.emit('start');
+          }
+        });
 
-  child.stdout.on('data', function(data){
-    data = typeof data === "string" ? data : ''+data;
-    child.emit('data', data.replace(/\n$/,''));
+        server.kill = function(){
+          child.kill();
+        };
 
-    if(data.match('Started org.openqa.jetty.jetty.Server')) {
-      child.emit('start');
-    }
-  });
+      };
 
-  return child;
+  addEvent(child);
+  return server;
 };
