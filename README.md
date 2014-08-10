@@ -5,6 +5,10 @@
 ```sh
 $ npm install -g wd-ct
 $ wd-ct -s
+prompt: Are you ok to generate interaction.js and testcase.csv? (y / n):  y
+prompt: Input interaction script name:  (interaction.js) 
+prompt: Input testcase CSV file name:  (testcase.csv) 
+$ wd-ct -i interaction.js -t testcase.csv
 ```
 
 ### Usage
@@ -60,7 +64,3 @@ https://github.com/,sideroad,,/sideroad,should be display sideroad github page
 https://github.com/,gruntjs,,/gruntjs,should be display gruntjs github page
 ```
 
-After preparation, execute `wd-ct`
-```sh
-$ wd-ct -i interaction.js -t testcase.csv
-```
