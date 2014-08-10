@@ -97,6 +97,8 @@ var WdCT = function(options){
       promise = browser.init({
         browserName: browserName,
         name: 'This is an example test',
+        hostname: '127.0.0.1',
+        port: server.port,
         proxy: options.proxy
       });
 

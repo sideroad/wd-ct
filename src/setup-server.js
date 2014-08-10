@@ -5,8 +5,8 @@
 var spawn = require('simple-spawn').spawn,
     path = require('path'),
     seleniumjar = __dirname+'/../vendor/selenium-server-standalone-2.42.2.jar',
-    port = 4444,
-    getDriverOptions = function(){
+    defaultPort = 4444,
+    getDriverOptions = function(port){
       var args = [],
           base = path.join( __dirname,'/../vendor/' );
 
@@ -27,7 +27,7 @@ var spawn = require('simple-spawn').spawn,
 
 
 module.exports = function(){
-  var child = spawn('java -jar ' + seleniumjar + getDriverOptions()),
+  var child,
       EventEmitter = require('events').EventEmitter,
       server = new EventEmitter(),
       addEvent = function(child){
@@ -37,8 +37,8 @@ module.exports = function(){
           server.emit('data', data.replace(/\n$/, ''));
           if(data.match('Selenium is already running on port')) {
             child.kill();
-            port++;
-            child = spawn('java -jar ' + seleniumjar + getDriverOptions());
+            server.port++;
+            child = spawn('java -jar ' + seleniumjar + getDriverOptions(server.port));
             addEvent(child);
           }
         });
@@ -58,6 +58,8 @@ module.exports = function(){
 
       };
 
+  server.port = defaultPort;
+  child = spawn('java -jar ' + seleniumjar + getDriverOptions(server.port));
   addEvent(child);
   return server;
 };
