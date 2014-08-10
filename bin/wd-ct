@@ -2,6 +2,8 @@
 
 // Run WdCT.
 var opts = require('opts'),
+    prompt = require('prompt'),
+    fs = require('fs'),
     options = {};
 
 opts.parse([
@@ -9,15 +11,13 @@ opts.parse([
     'short': 't',
     'long': 'testcase',
     'description': 'Target testcase file',
-    'value': true,
-    'required': true
+    'value': true
   },
   {
     'short': 'i',
     'long': 'interaction',
     'description': 'Target interaction file',
-    'value': true,
-    'required': true
+    'value': true
   },
   {
     'short': 'nl',
@@ -34,27 +34,74 @@ opts.parse([
     'short': 'nc',
     'long': 'no-color',
     'description': 'Not apply color to console',
+  },
+  {
+    'short': 's',
+    'long': 'scaffold',
+    'description': 'Generate sample script and csv from template'
   }
 ]);
 
+if(opts.get('scaffold')){
 
-options.testcase = opts.get('testcase');
-options.interaction = opts.get('interaction');
+  prompt.start();
+  prompt.get({
+    properties: {
+      ok: {
+        pattern: /^y|n$/,
+        description: 'Are you ok to generate interaction.js and testcase.csv? (y / n)',
+        default: 'y',
+        required: true
+      },
+      interaction: {
+        pattern: /^.*\.js$/,
+        description: 'Input interaction script name',
+        default: 'interaction.js',
+        required: true
+      },
+      testcase: {
+        pattern: /^.*\.csv$/,
+        description: 'Input testcase CSV file name',
+        default: 'testcase.csv',
+        required: true        
+      }
+    }
+  }, function(err, results){
+    if(results.ok){
+      fs.createReadStream(__dirname+'/../template/interaction.js').pipe(fs.createWriteStream(results.interaction));
+      fs.createReadStream(__dirname+'/../template/testcase.csv').pipe(fs.createWriteStream(results.testcase));
+    }
 
-var noLogging = opts.get('no-logging');
-if(noLogging) {
-  options.debug = false;
+  });
+  
+
+} else {
+
+  options.testcase = opts.get('testcase');
+  options.interaction = opts.get('interaction');
+
+  if(!options.testcase && 
+     !options.interaction ){
+    opts.help();
+    process.exit();
+  }
+
+  var noLogging = opts.get('no-logging');
+  if(noLogging) {
+    options.debug = false;
+  }
+
+  var noColor = opts.get('no-color');
+  if(noColor) {
+    options.color = false;
+  }
+
+  var browsers = opts.get('browsers');
+  if(browsers){
+    options.browsers =  browsers.split(',');
+  }
+
+  var WdCT = require('../src/wd-ct');
+  new WdCT( options );
 }
 
-var noColor = opts.get('no-color');
-if(noColor) {
-  options.color = false;
-}
-
-var browsers = opts.get('browsers');
-if(browsers){
-  options.browsers =  browsers.split(',');
-}
-
-var WdCT = require('../src/wd-ct');
-new WdCT( options );

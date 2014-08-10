@@ -106,7 +106,7 @@ var WdCT = function(options){
 
       async.waterfall([
         function registerInteraction(callback){
-          commands = require(process.cwd()+'/'+interaction)();
+          commands = require(process.cwd()+'/'+interaction)(wd);
           callback();
         },
         function getOrderTestCase(callback){

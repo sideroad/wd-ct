@@ -1,4 +1,4 @@
-module.exports = function(){
+module.exports = function(wd){
 	return {
 		input: {
 			"open": function(b, url){
