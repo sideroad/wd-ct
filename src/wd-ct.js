@@ -13,6 +13,7 @@ var async = require('async'),
     chai = require('chai'),
     chaiAsPromised = require('chai-as-promised'),
     csv = require('fast-csv'),
+    xlsx = require('node-xlsx'),
     wd = require('wd'),
     webdriver = require('wd/lib/webdriver'),
     SeleniumServer = require('./setup-server'),
@@ -128,6 +129,23 @@ var WdCT = function(options){
               .on("end", function(){
                 callback(null, header, body);
               });
+          } else if(suffix === 'xlsx') {
+            var workbook = xlsx.parse(testcase);
+            _.each(workbook.worksheets[0].data, function(data, row){
+                // Header should be ignore
+                if(row === 0){
+                  header = _.map(data, function(obj){
+                    return obj.value;
+                  });
+                  return;
+                }
+
+                body.push( _.map(data, function(obj){
+                  return obj.value;
+                }));
+            });
+            callback(null, header, body);
+
           }
         },
         function execute(header, body, callback){
