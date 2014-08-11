@@ -10,9 +10,9 @@
 
 var async = require('async'),
     _ = require('lodash'),
-    chai = require("chai"),
-    chaiAsPromised = require("chai-as-promised"),
-    csv = require("fast-csv"),
+    chai = require('chai'),
+    chaiAsPromised = require('chai-as-promised'),
+    csv = require('fast-csv'),
     wd = require('wd'),
     webdriver = require('wd/lib/webdriver'),
     SeleniumServer = require('./setup-server'),
@@ -73,8 +73,6 @@ var WdCT = function(options){
 
     async.mapSeries( options.browsers, function(browserName, callback){
       var promise,
-          order = [],
-          assert = [],
           commands;
 
       debug(('Setup browser ['+browserName+']').grey);
@@ -109,47 +107,72 @@ var WdCT = function(options){
           commands = require(process.cwd()+'/'+interaction)(wd);
           callback();
         },
-        function queuingTestCase(callback){
-          csv
-            .fromPath(testcase)
-            .on("record", function(data, row){
-              var queue = function(command, val){
-                    promise = promise.then(function(){
-                      return command(browser, val, store);
-                    }, function(e){
-                      throw e;
-                    });
-                  },
-                  assert = data.pop();
+        function loadTestCase(callback){
+          var header = [],
+              body = [],
+              suffix = testcase.match(/\.(.+)$/)[1];
 
-              // Header should be ignore
-              if(row === 0){
-                order = data;
-                return;
-              }
+          if(suffix === 'csv'){
+            csv
+              .fromPath(testcase)
+              .on("record", function(data, row){
 
-              // queuing input interaction
-              order.forEach(function(key, index){
-                var val = data[index];
-                queue( commands.input[key], val);
+                // Header should be ignore
+                if(row === 0){
+                  header = data;
+                  return;
+                }
+
+                body.push(data);
+              })
+              .on("end", function(){
+                callback(null, header, body);
               });
+          }
+        },
+        function execute(header, body, callback){
+          var queue = function(command, fn, val){
+                if(!fn){
+                  promise = promise.then(function(){
+                    throw new Error('Command not exists in script: '+command);
+                  });
+                  return;
+                }
+                promise = promise.then(function(){
+                  return fn.apply( browser, [val, store]);
+                }, function(e){
+                  throw e;
+                });
+              };
 
-              // queuing assertion interaction
-              queue( commands.assertion[assert] );
+          // remove assert header column
+          header.pop();
 
-            })
-            .on("end", function(){
-                callback();
+          _.each(body, function(data){
+            var assert = data[data.length -1];
+
+            // queuing input interaction
+            header.forEach(function(key, index){
+              var val = data[index];
+              queue( key, commands.input[key], val);
             });
+
+            // queuing assertion interaction
+            queue( assert, commands.assertion[assert] );
+          });
+          callback();
         }
       ], function(){
-        promise.then(function(){
+        var teadown = function(){
           debug(('Teardown browser ['+browserName+']').grey);
           return browser.quit();
+        };
+
+        promise.then(function(){
+          return teadown();
         },function(e){
           error(e.message.red);
-          debug(('Teardown browser ['+browserName+']').grey);
-          return browser.quit();
+          return teadown();
         }).fin(function(){
           callback(null);
         }).done();

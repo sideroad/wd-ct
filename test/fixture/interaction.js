@@ -1,28 +1,28 @@
 module.exports = function(wd){
 	return {
 		input: {
-			"open": function(b, url){
-				return b.get(url);
+			"open": function(url){
+				return this.get(url);
 			},
-			"input query": function(b, str){
-				return b.elementByCss('#lst-ib').type(str);
+			"input query": function(str){
+				return this.elementByCss('#lst-ib').type(str);
 			},
-			"submit": function(b){
-				return b.elementByCss('[name="btnK"]').click();
+			"submit": function(){
+				return this.elementByCss('[name="btnK"]').click();
 			},
-			"store date": function(b){
-				return b.storeEval('timestamp','+new Date()');
+			"store date": function(){
+				return this.storeEval('timestamp','+new Date()');
 			},
-			"alert": function(b, val, store){
-				return b.execute('alert('+store.timestamp+')');
+			"alert": function(val, store){
+				return this.execute('alert('+store.timestamp+')');
 			}
 		},
 		assertion: {
-			"should be display github page": function(b){
-				return b.waitForElementByCss('a[href=\"https://github.com/\"]', 1000).should.be.fulfilled;
+			"should be display github page": function(){
+				return this.waitForElementByCss('a[href=\"https://github.com/\"]', 1000).should.be.fulfilled;
 			},
-			"should be display sideroad secret page": function(b){
-				return b.waitForElementByCss('a[href="http://sideroad.secret.jp/"]').should.be.fulfilled;
+			"should be display sideroad secret page": function(){
+				return this.waitForElementByCss('a[href="http://sideroad.secret.jp/"]').should.be.fulfilled;
 			}
 		}
 	};
