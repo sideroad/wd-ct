@@ -23,10 +23,10 @@ module.exports = function(wd){
 		},
 		assertion: {
 			'should be display sideroad github page': function(){
-				return this.eval('window.location.href').should.eventually.equal('https://github.com/sideroad');
+				return this.eval('window.location.href').should.eventually.equal('https://github.com/sideroad/foo/bar/');
 			},
 			'should be display gruntjs github page': function(){
-				return this.eval('window.location.href').should.eventually.equal('https://github.com/gruntjs');
+				return this.eval('window.location.href').should.eventually.equal('https://github.com/gruntjs/foo/bar/');
 			}
 		}
 	};

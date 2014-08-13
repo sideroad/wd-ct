@@ -12,6 +12,7 @@ var async = require('async'),
     _ = require('lodash'),
     chai = require('chai'),
     chaiAsPromised = require('chai-as-promised'),
+    Q = require('q'),
     csv = require('fast-csv'),
     xlsx = require('node-xlsx'),
     wd = require('wd'),
@@ -25,7 +26,8 @@ var WdCT = function(options){
       error,
       testcase,
       server,
-      interaction;
+      interaction,
+      wdCtDefer = Q.defer();
 
   options = _.extend({
     browsers: ['firefox'],
@@ -158,8 +160,8 @@ var WdCT = function(options){
                 }
                 promise = promise.then(function(){
                   return fn.apply( browser, [val, store]);
-                }, function(e){
-                  throw e;
+                }, function(err){
+                  throw err;
                 });
               };
 
@@ -187,18 +189,24 @@ var WdCT = function(options){
         };
 
         promise.then(function(){
-          return teadown();
-        },function(e){
-          error(e.message.red);
-          return teadown();
-        }).fin(function(){
-          callback(null);
+          teadown();
+          callback();
+        },function(err){
+          error(err.message.red);
+          teadown();
+          callback(err);
         }).done();
       });
-    }, function(){
+    }, function(err){
       server.kill();
+      if(err){
+        wdCtDefer.reject(err);
+      } else {
+        wdCtDefer.resolve();
+      }
     });
   });
+  return wdCtDefer.promise;
 };
 
 module.exports =  WdCT;

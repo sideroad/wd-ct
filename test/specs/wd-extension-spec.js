@@ -5,16 +5,18 @@
 
     var SeleniumServer = require('../../src/setup-server'),
      	chai = require('chai'),
-     	server;
+     	server,
+        site;
 
     chai.should();
 
     before(function(done){
         var Site = require('../helpers/setup-site');
-        new Site();
+        site = new Site();
 
         server = new SeleniumServer();
         server.on('start', function(){
+            site.close();
             done();
         });
     });
