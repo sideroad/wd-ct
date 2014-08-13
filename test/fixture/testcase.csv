@@ -1,3 +1,3 @@
-open,input query,click user menu,click linkage,assert
-https://github.com/,sideroad,,/sideroad,should be display sideroad github page
-https://github.com/,gruntjs,,/gruntjs,should be display gruntjs github page
+open,input text,submit,assert
+http://localhost:8000/index.html,abcde,,should submit text parameter as abcde
+http://localhost:8000/index.html,12345,,should submit text parameter as 12345

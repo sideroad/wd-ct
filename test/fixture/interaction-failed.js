@@ -5,28 +5,22 @@ module.exports = function(wd){
 			'open': function(url){
 				return this.get(url);
 			},
-			'input query': function(str){
-				return this.waitForElementByCss('#js-command-bar-field')
+			'input text': function(str){
+				return this.waitForElementByCss('#text')
 				           .type(str)
-				           .fireEvents('#js-command-bar-field', 'change')
-				           .elementByCss('#top_search_form')
-				           .submit();
+				           .fireEvents('#text', 'change');
 			},
-			'click user menu': function(){
-				return this.waitForElementByCss('.search-menu-container ul.menu li:nth-of-type(4) a', 3000)
+			'submit': function(){
+				return this.elementByCss('#submit')
 				           .click();
-			},
-			'click linkage': function(href){
-                return this.waitForElementByCss('a[href="'+href+'"]', 3000)
-                           .click();
 			}
 		},
 		assertion: {
-			'should be display sideroad github page': function(){
-				return this.eval('window.location.href').should.eventually.equal('https://github.com/sideroad/foo/bar/');
+			'should submit text parameter as abcde': function(){
+				return this.eval('window.location.href').should.eventually.equal('http://localhost:8000/index.html?foo=bar');
 			},
-			'should be display gruntjs github page': function(){
-				return this.eval('window.location.href').should.eventually.equal('https://github.com/gruntjs/foo/bar/');
+			'should submit text parameter as 12345': function(){
+				return this.eval('window.location.href').should.eventually.equal('http://localhost:8000/index.html?foo=bar');
 			}
 		}
 	};

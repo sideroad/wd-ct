@@ -6,9 +6,12 @@
 </head>
 <body>
 	<div id="logger"></div>
-	<input type="text" id="text" value="" onchange="$('#logger').text(this.value)">
-	<input type="button" id="button" onclick="$('#logger').text('clicked button')" value="Button" >
-	<input type="button" id="will-be-vanish" onclick="$(this).remove()" value="WillBeVanish" >
-	<input type="button" id="will-be-disappear" onclick="$(this).hide()" value="WillBeDisappear" >
+	<form id="form">
+		<input type="text" id="text" name="text" value="" onchange="$('#logger').text(this.value)">
+		<input type="button" id="button" onclick="$('#logger').text('clicked button')" value="Button" >
+		<input type="button" id="will-be-vanish" onclick="$(this).remove()" value="WillBeVanish" >
+		<input type="button" id="will-be-disappear" onclick="$(this).hide()" value="WillBeDisappear" >
+		<input type="submit" id="submit" value="Submit" >
+	</form>
 </body>
 </html>
