@@ -27,7 +27,7 @@ opts.parse([
   {
     'short': 'b',
     'long': 'browsers',
-    'description': 'Browser',
+    'description': 'Browser ( comma separatted )',
     'value': true
   },
   {
@@ -39,6 +39,17 @@ opts.parse([
     'short': 's',
     'long': 'scaffold',
     'description': 'Generate sample script and csv from template'
+  },
+  {
+    'short': 'sw',
+    'long': 'stepwise',
+    'description': 'Stepwise execution'
+  },
+  {
+    'short': 'bp',
+    'long': 'breakpoint',
+    'description': 'Set break point after the command executed',
+    'value': true
   }
 ]);
 
@@ -99,6 +110,16 @@ if(opts.get('scaffold')){
   var browsers = opts.get('browsers');
   if(browsers){
     options.browsers =  browsers.split(',');
+  }
+
+  var stepwise = opts.get('stepwise');
+  if(stepwise){
+    options.stepwise = true;
+  }
+
+  var breakpoint = opts.get('breakpoint');
+  if(breakpoint){
+    options.breakpoint = breakpoint;
   }
 
   var WdCT = require('../src/wd-ct');

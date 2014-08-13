@@ -50,7 +50,7 @@
     "prompt": "^0.2.13",
     "q": "0.9.x",
     "simple-spawn": "0.0.2",
-    "wd": "^0.3.4"
+    "wd": "git://github.com/sideroad/wd.git"
   },
   "devDependencies": {
     "express": "^4.8.2",

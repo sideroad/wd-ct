@@ -27,6 +27,8 @@ var WdCT = function(options){
       testcase,
       server,
       interaction,
+      stepwise,
+      breakpoint,
       wdCtDefer = Q.defer();
 
   options = _.extend({
@@ -41,6 +43,8 @@ var WdCT = function(options){
 
   testcase = options.testcase;
   interaction = options.interaction;
+  stepwise = options.stepwise;
+  breakpoint = options.breakpoint;
   debug = options.debug ? function(){
     console.log.apply(console.log, arguments);
   } : function(){};
@@ -163,6 +167,13 @@ var WdCT = function(options){
                 }, function(err){
                   throw err;
                 });
+
+                if(stepwise || ( breakpoint === command )){
+                  promise = promise.then(function(){
+                    return browser.break();
+                  });
+                }
+
               };
 
           // remove assert header column
