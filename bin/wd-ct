@@ -50,6 +50,12 @@ opts.parse([
     'long': 'breakpoint',
     'description': 'Set break point after the command executed',
     'value': true
+  },
+  {
+    'short': 'sc',
+    'long': 'startcolumn',
+    'description': 'Interation start column index number should be set',
+    'value': true
   }
 ]);
 
@@ -121,6 +127,12 @@ if(opts.get('scaffold')){
   if(breakpoint){
     options.breakpoint = breakpoint;
   }
+
+  var startColumn = opts.get('startcolumn');
+  if(startColumn){
+    options.startColumn = startColumn;
+  }
+
 
   var WdCT = require('../src/wd-ct');
   new WdCT( options );

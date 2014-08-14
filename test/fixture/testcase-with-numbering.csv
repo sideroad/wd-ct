@@ -1,0 +1,3 @@
+No,open,input text,submit,assert
+1,http://localhost:8000/index.html,abcde,,should submit text parameter as abcde
+2,http://localhost:8000/index.html,12345,,should submit text parameter as 12345

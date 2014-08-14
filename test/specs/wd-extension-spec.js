@@ -26,48 +26,6 @@
     	done();
     });
 
-    describe('webdriver extensions', function () {
-	    var wd = require('wd'),
-    		webdriver = require('wd/lib/webdriver'),
-    		store = {};
-
-		require('../../src/wd-extension')(wd, webdriver, store);
-        describe('waitForNoElement', function () {
-            it('should wait for element not present', function (done) {
-            	var b = wd.promiseChainRemote();
-            	b.init({
-                    browserName: 'phantomjs',
-                    port: server.port
-                 })
-    	    	 .get('http://localhost:8000/')
-            	 .elementByCss('#will-be-vanish')
-            	 .waitForNoElement('#will-be-vanish', 10000)
-            	 .then(function(){
-            	 	b.quit();
-            		done();
-            	 });
-            });
-        });
-
-        describe('waitForNotVisible', function () {
-            it('should wait for element disappear', function (done) {
-            	var b = wd.promiseChainRemote();
-                b.init({
-                    browserName: 'phantomjs',
-                    port: server.port
-                 })
-    	    	 .get('http://localhost:8000/')
-            	 .elementByCss('#will-be-disappear')
-            	 .waitForNotVisible('#will-be-disappear', 10000)
-            	 .then(function(){
-            	 	b.quit();
-            		done();
-            	 });
-            });
-        });
-    });
-
-
     describe('addPromiseChainMethod', function () {
 	    var wd = require('wd'),
     		webdriver = require('wd/lib/webdriver'),

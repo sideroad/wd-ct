@@ -29,6 +29,7 @@ var WdCT = function(options){
       interaction,
       stepwise,
       breakpoint,
+      startColumn,
       wdCtDefer = Q.defer();
 
   options = _.extend({
@@ -38,13 +39,17 @@ var WdCT = function(options){
     color: true,
     debug: true,
     error: true,
-    proxy: undefined
+    proxy: undefined,
+    breakpoint: undefined,
+    stepwise: undefined,
+    startColumn: 0
   }, options);
 
   testcase = options.testcase;
   interaction = options.interaction;
   stepwise = options.stepwise;
   breakpoint = options.breakpoint;
+  startColumn = options.startColumn;
   debug = options.debug ? function(){
     console.log.apply(console.log, arguments);
   } : function(){};
@@ -176,11 +181,17 @@ var WdCT = function(options){
 
               };
 
+          // start column index
+          header = _.rest(header, startColumn);
+
           // remove assert header column
           header.pop();
 
           _.each(body, function(data){
-            var assert = data[data.length -1];
+            var assert;
+
+            data = _.rest(data, startColumn);
+            assert = data[data.length -1];
 
             // queuing input interaction
             header.forEach(function(key, index){

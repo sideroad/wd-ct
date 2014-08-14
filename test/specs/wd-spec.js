@@ -53,6 +53,20 @@
                 });
                 wdCt.should.not.equal(null);
             });
+            it('should ignore first column', function (done) {
+                var wdCt = new WdCT({
+                    interaction: 'test/fixture/interaction.js',
+                    testcase: 'test/fixture/testcase-with-numbering.csv',
+                    browsers: ['phantomjs'],
+                    startColumn: 1,
+                    debug: false
+                }).then(function(){
+                    done();
+                }, function(err){
+                    done(err);
+                });
+                wdCt.should.not.equal(null);
+            });
             it('should fail test', function (done) {
                 var wdCt = new WdCT({
                     interaction: 'test/fixture/interaction-failed.js',
