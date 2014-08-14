@@ -13,6 +13,8 @@ $ wd-ct -i interaction.js -t testcase.csv
 
 ### Usage
 ```sh
+$ wd-ct --help
+
 ##############################################
 #  ██╗    ██╗██████╗        ██████╗████████╗ #
 #  ██║    ██║██╔══██╗      ██╔════╝╚══██╔══╝ #
@@ -27,7 +29,7 @@ Display usage
     -h, --help
 Interation start column index number should be set
     -sc, --startcolumn <value>
-Set break point after the command executed
+Set breakpoint after the command executed
     -bp, --breakpoint <value>
 Stepwise execution
     -sw, --stepwise

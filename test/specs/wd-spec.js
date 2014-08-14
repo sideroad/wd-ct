@@ -73,13 +73,14 @@
                     testcase: 'test/fixture/testcase.csv',
                     browsers: ['phantomjs'],
                     debug: false,
-                    error: false
+                    error: false,
+                    errorScreenshot: 'capture'
                 }).then(function(){
                     done('should fail');
                 }, function(err){
-                    err.should.have.property('message')
-                       .and.equal("expected 'http://localhost:8000/index.html?text=abcde' to equal "+
-                                           "'http://localhost:8000/index.html?foo=bar'");
+                    var expected = new RegExp("expected 'http://localhost:8000/index.html\\?text=abcde' to equal "+
+                                                       "'http://localhost:8000/index.html\\?foo=bar' capture\\[ .+.png \\]");
+                    err.should.have.property('message').to.match(expected);
                     done();
                 });
                 wdCt.should.not.equal(null);

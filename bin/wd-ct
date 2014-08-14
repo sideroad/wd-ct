@@ -48,13 +48,19 @@ opts.parse([
   {
     'short': 'bp',
     'long': 'breakpoint',
-    'description': 'Set break point after the command executed',
+    'description': 'Set breakpoint after the command executed',
     'value': true
   },
   {
     'short': 'sc',
     'long': 'startcolumn',
     'description': 'Interation start column index number should be set',
+    'value': true
+  },
+  {
+    'short': 'es',
+    'long': 'errorscreenshot',
+    'description': 'Capture page when error occurred. please set captured image directory path',
     'value': true
   },
   {

@@ -11,11 +11,13 @@
 var async = require('async'),
     _ = require('lodash'),
     chai = require('chai'),
+    fs = require('fs'),
     chaiAsPromised = require('chai-as-promised'),
     Q = require('q'),
     csv = require('fast-csv'),
     xlsx = require('node-xlsx'),
     wd = require('wd'),
+    path = require('path'),
     webdriver = require('wd/lib/webdriver'),
     SeleniumServer = require('./setup-server'),
     browser,
@@ -30,6 +32,7 @@ var WdCT = function(options){
       stepwise,
       breakpoint,
       startColumn,
+      errorScreenshot,
       wdCtDefer = Q.defer();
 
   options = _.extend({
@@ -42,6 +45,7 @@ var WdCT = function(options){
     proxy: undefined,
     breakpoint: undefined,
     stepwise: undefined,
+    errorScreenshot: false,
     startColumn: 0
   }, options);
 
@@ -50,6 +54,7 @@ var WdCT = function(options){
   stepwise = options.stepwise;
   breakpoint = options.breakpoint;
   startColumn = options.startColumn;
+  errorScreenshot = options.errorScreenshot;
   debug = options.debug ? function(){
     console.log.apply(console.log, arguments);
   } : function(){};
@@ -170,6 +175,16 @@ var WdCT = function(options){
                 promise = promise.then(function(){
                   return fn.apply( browser, [val, store]);
                 }, function(err){
+                  var filename;
+                  if(errorScreenshot) {
+                    filename = path.join( errorScreenshot, + new Date().getTime()+'.png');
+                    browser.takeScreenshot()
+                           .then(function(screenshot){
+                               fs.writeFileSync(filename, new Buffer( screenshot, 'base64').toString('binary'), 'binary');
+                           });
+                    errorScreenshot = false;
+                    err.message += ' capture[ '+filename+' ]';
+                  }
                   throw err;
                 });
 

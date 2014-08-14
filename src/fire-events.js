@@ -1,3 +1,4 @@
+/* global document */
 var event,
     name = arguments[1];
 if (document.createEvent) {

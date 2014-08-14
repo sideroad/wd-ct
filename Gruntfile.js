@@ -2,6 +2,13 @@
 
 module.exports = function(grunt) {
 	grunt.initConfig({
+	  clean: ['capture/*'],
+	  jshint: {
+	  	options: {
+	  		jshintrc: true
+	  	},
+	  	src: ['src/*.js']
+	  },
 	  mochacov: {
 	    options: {
 	      require: [],
@@ -25,10 +32,14 @@ module.exports = function(grunt) {
 	});
 
 
+	grunt.loadNpmTasks('grunt-contrib-clean');
+	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-mocha-cov');
-	grunt.registerTask('test', ['mochacov:test']);
+	grunt.registerTask('test', ['clean', 'mochacov:test']);
 	grunt.registerTask('coverage', ['mochacov:coverage']);
 
 	grunt.registerTask('ci', ['mochacov:test', 'mochacov:coverage']);
+	grunt.registerTask('default', ['clean', 'jshint', 'mochacov:test']);
+
 };
 
