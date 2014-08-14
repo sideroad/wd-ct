@@ -168,7 +168,9 @@ var WdCT = function(options){
           var queue = function(command, fn, val){
                 if(!fn){
                   promise = promise.then(function(){
-                    throw new Error('Command not exists in script: '+command);
+                    var err = new Error();
+                    err.message = 'Command not exists in script: '+command;
+                    throw err;
                   });
                   return;
                 }

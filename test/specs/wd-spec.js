@@ -85,6 +85,21 @@
                 });
                 wdCt.should.not.equal(null);
             });
+            it('should throw error when command does not exists', function (done) {
+                var wdCt = new WdCT({
+                    interaction: 'test/fixture/interaction-not-enough.js',
+                    testcase: 'test/fixture/testcase.xlsx',
+                    browsers: ['phantomjs'],
+                    debug: false,
+                    error: false
+                }).then(function(){
+                    done('should fail');
+                }, function(err){
+                    err.should.have.property('message').and.equal('Command not exists in script: input text');
+                    done();
+                });
+                wdCt.should.not.equal(null);
+            });
         });
         describe('execute with breakpoint', function () {
             it('should stop after the command of breakpoint arguments', function (done) {
