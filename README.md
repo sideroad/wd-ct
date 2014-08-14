@@ -12,6 +12,39 @@ $ wd-ct -i interaction.js -t testcase.csv
 ```
 
 ### Usage
+```sh
+##############################################
+#  ██╗    ██╗██████╗        ██████╗████████╗ #
+#  ██║    ██║██╔══██╗      ██╔════╝╚══██╔══╝ #
+#  ██║ █╗ ██║██║  ██║█████╗██║        ██║    #
+#  ██║███╗██║██║  ██║╚════╝██║        ██║    #
+#  ╚███╔███╔╝██████╔╝      ╚██████╗   ██║    #
+#   ╚══╝╚══╝ ╚═════╝        ╚═════╝   ╚═╝    #
+##############################################
+
+Usage: node /Users/sideroad/workspace/wd-ct/bin/wd-ct [options]
+Display usage
+    -h, --help
+Interation start column index number should be set
+    -sc, --startcolumn <value>
+Set break point after the command executed
+    -bp, --breakpoint <value>
+Stepwise execution
+    -sw, --stepwise
+Generate sample script and csv from template
+    -s, --scaffold
+Not apply color to console
+    -nc, --no-color
+Browser ( comma separatted )
+    -b, --browsers <value>
+Not output logging
+    -nl, --no-logging
+Target interaction file
+    -i, --interaction <value>
+Target testcase file
+    -t, --testcase <value>
+```
+
 Prepare interaction.js and testcase.csv following below.
 
 #### interaction.js
