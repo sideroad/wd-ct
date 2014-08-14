@@ -2,15 +2,16 @@
 <html>
 <head>
 	<script type="text/javascript" src='http://code.jquery.com/jquery-2.1.1.min.js'></script>
+	<script type="text/javascript" src='site.js'></script>
 	<title>Wd-CT</title>
 </head>
 <body>
 	<div id="logger"></div>
 	<form id="form">
-		<input type="text" id="text" name="text" value="" onchange="$('#logger').text(this.value)">
-		<input type="button" id="button" onclick="$('#logger').text('clicked button')" value="Button" >
-		<input type="button" id="will-be-vanish" onclick="$(this).remove()" value="WillBeVanish" >
-		<input type="button" id="will-be-disappear" onclick="$(this).hide()" value="WillBeDisappear" >
+		<input type="text" id="text" name="text" value="" >
+		<input type="button" id="button" value="Button" >
+		<input type="button" id="will-be-vanish" value="WillBeVanish" >
+		<input type="button" id="will-be-disappear" value="WillBeDisappear" >
 		<input type="submit" id="submit" value="Submit" >
 	</form>
 </body>

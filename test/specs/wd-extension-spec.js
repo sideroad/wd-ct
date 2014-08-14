@@ -41,7 +41,7 @@
                  })
     	    	 .get('http://localhost:8000/')
             	 .elementByCss('#will-be-vanish')
-            	 .waitForNoElement('#will-be-vanish')
+            	 .waitForNoElement('#will-be-vanish', 10000)
             	 .then(function(){
             	 	b.quit();
             		done();
@@ -58,7 +58,7 @@
                  })
     	    	 .get('http://localhost:8000/')
             	 .elementByCss('#will-be-disappear')
-            	 .waitForNotVisible('#will-be-disappear')
+            	 .waitForNotVisible('#will-be-disappear', 10000)
             	 .then(function(){
             	 	b.quit();
             		done();
