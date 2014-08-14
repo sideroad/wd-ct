@@ -56,6 +56,10 @@ opts.parse([
     'long': 'startcolumn',
     'description': 'Interation start column index number should be set',
     'value': true
+  },
+  {
+    'short': 'h',
+    'long': 'help'
   }
 ]);
 
@@ -97,8 +101,8 @@ if(opts.get('scaffold')){
   options.testcase = opts.get('testcase');
   options.interaction = opts.get('interaction');
 
-  if(!options.testcase && 
-     !options.interaction ){
+  if( (!options.testcase && !options.interaction) || 
+        opts.get('help')){
     opts.help();
     process.exit();
   }
