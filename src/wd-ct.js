@@ -222,18 +222,18 @@ var WdCT = function(options){
           callback();
         }
       ], function(){
-        var teadown = function(){
+        var teadown = function(err){
           debug(('Teardown browser ['+browserName+']').grey);
-          return browser.quit();
+          return browser.quit().then(function(){
+            callback(err);
+          });
         };
 
         promise.then(function(){
           teadown();
-          callback();
         },function(err){
           error(err.message.red);
-          teadown();
-          callback(err);
+          teadown(err);
         }).done();
       });
     }, function(err){
