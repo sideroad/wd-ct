@@ -27,6 +27,8 @@ $ wd-ct --help
 Usage: node /Users/sideroad/workspace/wd-ct/bin/wd-ct [options]
 Display usage
     -h, --help
+Capture page when error occurred. please set captured image directory path
+    -es, --errorscreenshot <value>
 Interation start column index number should be set
     -sc, --startcolumn <value>
 Set breakpoint after the command executed
