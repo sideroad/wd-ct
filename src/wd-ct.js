@@ -33,6 +33,8 @@ var WdCT = function(options){
       breakpoint,
       startColumn,
       errorScreenshot,
+      force,
+      logger,
       wdCtDefer = Q.defer();
 
   options = _.extend({
@@ -46,7 +48,9 @@ var WdCT = function(options){
     breakpoint: undefined,
     stepwise: undefined,
     errorScreenshot: false,
-    startColumn: 0
+    force: false,
+    startColumn: 0,
+    logger: console.log
   }, options);
 
   testcase = options.testcase;
@@ -55,11 +59,13 @@ var WdCT = function(options){
   breakpoint = options.breakpoint;
   startColumn = options.startColumn;
   errorScreenshot = options.errorScreenshot;
+  force = options.force;
+  logger = options.logger;
   debug = options.debug ? function(){
-    console.log.apply(console.log, arguments);
+    logger.apply(logger, arguments);
   } : function(){};
   error = options.error ? function(){
-    console.log.apply(console.log, arguments);
+    logger.apply(logger, arguments);
   } : function(){};
 
   // Apply wd-extension
@@ -174,8 +180,9 @@ var WdCT = function(options){
                   });
                   return;
                 }
+
                 promise = promise.then(function(){
-                  return fn.apply( browser, [val, store]);
+                  return fn.apply( browser, [val, store]);                  
                 }, function(err){
                   var filename;
                   if(errorScreenshot) {
@@ -187,7 +194,11 @@ var WdCT = function(options){
                     errorScreenshot = false;
                     err.message += ' capture[ '+filename+' ]';
                   }
-                  throw err;
+                  if(!force) {
+                    throw err;
+                  } else {
+                    error(err.message.red);
+                  }
                 });
 
                 if(stepwise || ( breakpoint === command )){
@@ -233,7 +244,7 @@ var WdCT = function(options){
           teadown();
         },function(err){
           error(err.message.red);
-          teadown(err);
+          teadown( force ? undefined : err);
         }).done();
       });
     }, function(err){

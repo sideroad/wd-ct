@@ -12,11 +12,11 @@ module.exports = function(wd){
     },
     assertion: {
       'should submit text parameter as abcde': function(){
-        return this.eval('window.location.href')
+        return this.url()
                    .should.eventually.equal('http://localhost:8000/index.html?text=abcde');
       },
       'should submit text parameter as 12345': function(){
-        return this.eval('window.location.href')
+        return this.url()
                    .should.eventually.equal('http://localhost:8000/index.html?text=12345');
       }
     }

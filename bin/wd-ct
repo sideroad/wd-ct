@@ -64,6 +64,11 @@ opts.parse([
     'value': true
   },
   {
+    'short': 'f',
+    'long': 'force',
+    'description': 'Continue to execute test even though error occurred'
+  },
+  {
     'short': 'h',
     'long': 'help',
     'description': 'Display usage'

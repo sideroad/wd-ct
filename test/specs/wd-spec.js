@@ -4,9 +4,11 @@
     'use strict';
 
     var chai = require('chai'),
+        spies = require('chai-spies'),
         prompt = require('prompt'),
         site;
 
+    chai.use(spies);
     chai.should();
 
     before(function(done){
@@ -67,22 +69,44 @@
                 });
                 wdCt.should.not.equal(null);
             });
-            it('should fail test', function (done) {
-                var wdCt = new WdCT({
-                    interaction: 'test/fixture/interaction-failed.js',
-                    testcase: 'test/fixture/testcase.csv',
-                    browsers: ['phantomjs'],
-                    debug: false,
-                    error: false,
-                    errorScreenshot: 'capture'
-                }).then(function(){
-                    done('should fail');
-                }, function(err){
-                    var expected = new RegExp("expected 'http://localhost:8000/index.html\\?text=abcde' to equal "+
-                                                       "'http://localhost:8000/index.html\\?foo=bar' capture\\[ .+.png \\]");
-                    err.should.have.property('message').to.match(expected);
-                    done();
-                });
+            it('should fail and interrupted', function (done) {
+                var logger = chai.spy(function(){}),
+                    wdCt = new WdCT({
+                        interaction: 'test/fixture/interaction-failed.js',
+                        testcase: 'test/fixture/testcase.csv',
+                        browsers: ['phantomjs'],
+                        debug: false,
+                        logger: logger,
+                        errorScreenshot: 'capture'
+                    }).then(function(){
+                        done('should fail');
+                    }, function(err){
+                        var expected = new RegExp("expected 'http://localhost:8000/index.html\\?text=abcde' to equal "+
+                                                           "'http://localhost:8000/index.html\\?aaa=bbb' capture\\[ .+.png \\]");
+                        err.should.have.property('message').to.match(expected);
+
+                        // error should be occurred once.
+                        logger.should.have.been.called.once;
+                        done();
+                    });
+                wdCt.should.not.equal(null);
+            });
+            it('should continue test even through error occurred', function (done) {
+                var logger = chai.spy(function(){}),
+                    wdCt = new WdCT({
+                        interaction: 'test/fixture/interaction-failed.js',
+                        testcase: 'test/fixture/testcase.csv',
+                        browsers: ['phantomjs'],
+                        debug: false,
+                        logger: logger,
+                        force: true
+                    }).then(function(){
+                        // error should be occurred twice.
+                        logger.should.have.been.called.twice;
+                        done();
+                    }, function(err){
+                        done(err);
+                    });
                 wdCt.should.not.equal(null);
             });
             it('should throw error when command does not exists', function (done) {
