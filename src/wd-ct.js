@@ -69,7 +69,7 @@ var WdCT = function(options){
   } : function(){};
 
   // Apply wd-extension
-  require('./wd-extension')(wd, webdriver, store);
+  require('./wd-extension')(wd, webdriver, store, logger);
 
   // Apply colors to console.log
   var colors = require('colors');
@@ -127,7 +127,7 @@ var WdCT = function(options){
 
       async.waterfall([
         function registerInteraction(callback){
-          commands = require(process.cwd()+'/'+interaction)(wd);
+          commands = require(process.cwd()+'/'+interaction)(wd, store);
           callback();
         },
         function loadTestCase(callback){

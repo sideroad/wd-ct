@@ -5,9 +5,12 @@
 
     var SeleniumServer = require('../../src/setup-server'),
      	chai = require('chai'),
+        spies = require('chai-spies'),
+        prompt = require('prompt'),
      	server,
         site;
 
+    chai.use(spies);
     chai.should();
 
     before(function(done){
@@ -19,6 +22,11 @@
             site.close();
             done();
         });
+
+        prompt.override = {
+            breakpoint: ' '
+        };
+
     });
 
     after(function(done){
@@ -29,9 +37,10 @@
     describe('addPromiseChainMethod', function () {
 	    var wd = require('wd'),
     		webdriver = require('wd/lib/webdriver'),
-    		store = {};
+    		store = {},
+            breaklog = chai.spy(function(){});
 
-		require('../../src/wd-extension')(wd, webdriver, store);
+		require('../../src/wd-extension')(wd, webdriver, store, breaklog);
         describe('storeEval', function () {
             it('should store executed script', function (done) {
             	var b = wd.promiseChainRemote();
@@ -51,22 +60,44 @@
 
         describe('fireEvents', function () {
             it('should emit events', function (done) {
-            	var b = wd.promiseChainRemote();
+                var b = wd.promiseChainRemote();
                 b.init({
                     browserName: 'phantomjs',
                     port: server.port
                  })
-    	    	 .get('http://localhost:8000/')
-    	    	 .elementByCss('#text')
-    	    	 .type('abcde')
-            	 .fireEvents('#text', 'change')
-            	 .elementByCss('#logger')
-        		 .text()
-            	 .then(function(text){
-            	 	text.should.equal('abcde');
-            	 	b.quit();
-            		done();
-            	 });
+                 .get('http://localhost:8000/')
+                 .elementByCss('#text')
+                 .type('abcde')
+                 .fireEvents('#text', 'change')
+                 .elementByCss('#logger')
+                 .text()
+                 .then(function(text){
+                    text.should.equal('abcde');
+                    b.quit();
+                    done();
+                 });
+            });
+        });
+
+        describe('break', function () {
+            it('should pause execution', function (done) {
+                var b = wd.promiseChainRemote();
+                b.init({
+                    browserName: 'phantomjs',
+                    port: server.port
+                 })
+                 .get('http://localhost:8000/')
+                 .break()
+                 .elementByCss('#text')
+                 .type('abcde')
+                 .fireEvents('#text', 'change')
+                 .elementByCss('#logger')
+                 .text()
+                 .then(function(text){
+                    text.should.equal('abcde');
+                    b.quit();
+                    done();
+                 });
             });
         });
 

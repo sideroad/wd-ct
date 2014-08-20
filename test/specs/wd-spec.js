@@ -17,7 +17,7 @@
         done();
 
         prompt.override = {
-            break: '\n'
+            breakpoint: ' '
         };
     });
 

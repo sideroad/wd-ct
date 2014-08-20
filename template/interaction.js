@@ -1,4 +1,4 @@
-module.exports = function(wd){
+module.exports = function(wd, store){
   'use strict';
   return {
     input: {
@@ -23,11 +23,11 @@ module.exports = function(wd){
     },
     assertion: {
       'should be display sideroad github page': function(){
-        return this.eval('window.location.href')
+        return this.url()
                    .should.eventually.equal('https://github.com/sideroad');
       },
       'should be display gruntjs github page': function(){
-        return this.eval('window.location.href')
+        return this.url()
                    .should.eventually.equal('https://github.com/gruntjs');
       }
     }
