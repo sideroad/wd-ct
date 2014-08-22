@@ -16,6 +16,7 @@ var async = require('async'),
     Q = require('q'),
     csv = require('fast-csv'),
     xlsx = require('node-xlsx'),
+    XLS = require('xlsjs'),
     wd = require('wd'),
     path = require('path'),
     webdriver = require('wd/lib/webdriver'),
@@ -30,7 +31,6 @@ var WdCT = function(options){
       server,
       interaction,
       stepwise,
-      breakpoint,
       startColumn,
       errorScreenshot,
       force,
@@ -45,7 +45,6 @@ var WdCT = function(options){
     debug: true,
     error: true,
     proxy: undefined,
-    breakpoint: undefined,
     stepwise: undefined,
     errorScreenshot: false,
     force: false,
@@ -56,7 +55,6 @@ var WdCT = function(options){
   testcase = options.testcase;
   interaction = options.interaction;
   stepwise = options.stepwise;
-  breakpoint = options.breakpoint;
   startColumn = options.startColumn;
   errorScreenshot = options.errorScreenshot;
   force = options.force;
@@ -152,8 +150,7 @@ var WdCT = function(options){
                 callback(null, header, body);
               });
           } else if(suffix === 'xlsx') {
-            var workbook = xlsx.parse(testcase);
-            _.each(workbook.worksheets[0].data, function(data, row){
+            _.each(xlsx.parse(testcase).worksheets[0].data, function(data, row){
                 // Header should be ignore
                 if(row === 0){
                   header = _.map(data, function(obj){
@@ -167,7 +164,16 @@ var WdCT = function(options){
                 }));
             });
             callback(null, header, body);
+          } else if(suffix === 'xls') {
+            (function(){
+              var workbook = XLS.readFile(testcase),
+                  worksheet = workbook.Sheets[ workbook.SheetNames[0] ],
+                  data = XLS.utils.sheet_to_json( worksheet, {header: 1} );
 
+              header = data.shift();
+              body = data;
+              callback(null, header, body);
+            })();
           }
         },
         function execute(header, body, callback){
@@ -201,7 +207,7 @@ var WdCT = function(options){
                   }
                 });
 
-                if(stepwise || ( breakpoint === command )){
+                if(stepwise){
                   promise = promise.then(function(){
                     return browser.break();
                   });

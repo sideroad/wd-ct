@@ -46,12 +46,6 @@ opts.parse([
     'description': 'Stepwise execution'
   },
   {
-    'short': 'bp',
-    'long': 'breakpoint',
-    'description': 'Set breakpoint after the command executed',
-    'value': true
-  },
-  {
     'short': 'sc',
     'long': 'startcolumn',
     'description': 'Interation start column index number should be set',
@@ -76,35 +70,46 @@ opts.parse([
 ]);
 
 if(opts.get('scaffold')){
-
+  prompt.message = '';
+  prompt.message = '';
   prompt.start();
   prompt.get({
     properties: {
-      ok: {
+      ok_to_create_testcase: {
         pattern: /^y|n$/,
-        description: 'Are you ok to generate interaction.js and testcase.csv? (y / n)',
+        description: 'Are you sure you want to generate testcase? (y / n)',
         default: 'y',
-        required: true
+        required: true,
+        delimiter: ':'
+      },
+      testcase: {
+        pattern: /^.*\.(csv|xls|xlsx)$/,
+        description: 'Input testcase file name.( csv, xls, xlsx extension is permitted )',
+        default: 'testcase.csv',
+        required: true,
+        delimiter: ':'
+      },
+      ok_to_create_interaction: {
+        pattern: /^y|n$/,
+        description: 'Are you sure you want to generate interaction.js? (y / n)',
+        default: 'y',
+        required: true,
+        delimiter: ':'
       },
       interaction: {
         pattern: /^.*\.js$/,
         description: 'Input interaction script name',
         default: 'interaction.js',
-        required: true
-      },
-      testcase: {
-        pattern: /^.*\.csv$/,
-        description: 'Input testcase CSV file name',
-        default: 'testcase.csv',
-        required: true        
+        required: true,
+        delimiter: ':'
       }
     }
   }, function(err, results){
-    if(results.ok){
-      fs.createReadStream(__dirname+'/../template/interaction.js').pipe(fs.createWriteStream(results.interaction));
+    if(results.ok_to_create_testcase) {
       fs.createReadStream(__dirname+'/../template/testcase.csv').pipe(fs.createWriteStream(results.testcase));
+    } else if(results.ok_to_create_interaction){
+      fs.createReadStream(__dirname+'/../template/interaction.js').pipe(fs.createWriteStream(results.interaction));
     }
-
   });
   
 
@@ -148,11 +153,6 @@ if(opts.get('scaffold')){
   var stepwise = opts.get('stepwise');
   if(stepwise){
     options.stepwise = true;
-  }
-
-  var breakpoint = opts.get('breakpoint');
-  if(breakpoint){
-    options.breakpoint = breakpoint;
   }
 
   var startColumn = opts.get('startcolumn');

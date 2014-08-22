@@ -6,6 +6,9 @@ module.exports = function(wd, webdriver, store, logger){
       prompt = require('prompt'),
       fireEvents = fs.readFileSync( path.join( __dirname, '/fire-events.js'), 'utf8').toString();
 
+  prompt.message = '';
+  prompt.delimiter = '';
+
   // adding custom promise chain method
   wd.addPromiseChainMethod(
     'storeEval',
@@ -34,13 +37,14 @@ module.exports = function(wd, webdriver, store, logger){
       var that = this,
           defer = Q.defer();
 
+      logger('Input command or press enter to continue.');
       prompt.start();
       prompt.get({
         properties: {
           breakpoint: {
-            description: 'Input command or press enter to continue.'
+            description: '>'
           }
-        }
+        },
       }, function(err, res){
         var text = res.breakpoint.replace(/^\s*(.*)\s*$/,'$1'),
             matched,
@@ -54,7 +58,6 @@ module.exports = function(wd, webdriver, store, logger){
           defer.resolve(that);
         } else {
           matched = text.match(/^store(?:\.(.+))?$/);
-
           if( matched ) {
             variable = matched[1];
             logger( variable ? store[variable] : store );

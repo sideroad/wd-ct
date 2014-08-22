@@ -42,10 +42,23 @@
                 });
                 wdCt.should.not.equal(null);
             });
-            it('should succeed Excel test', function (done) {
+            it('should succeed xlsx test', function (done) {
                 var wdCt = new WdCT({
                     interaction: 'test/fixture/interaction.js',
                     testcase: 'test/fixture/testcase.xlsx',
+                    browsers: ['phantomjs'],
+                    debug: false
+                }).then(function(){
+                    done();
+                }, function(err){
+                    done(err);
+                });
+                wdCt.should.not.equal(null);
+            });
+            it('should succeed xls test', function (done) {
+                var wdCt = new WdCT({
+                    interaction: 'test/fixture/interaction.js',
+                    testcase: 'test/fixture/testcase.xls',
                     browsers: ['phantomjs'],
                     debug: false
                 }).then(function(){
@@ -126,33 +139,22 @@
             });
         });
         describe('execute with breakpoint', function () {
-            it('should stop after the command of breakpoint arguments', function (done) {
-                var wdCt = new WdCT({
-                    interaction: 'test/fixture/interaction.js',
-                    testcase: 'test/fixture/testcase.csv',
-                    browsers: ['phantomjs'],
-                    debug: false,
-                    breakpoint: 'submit'
-                }).then(function(){
-                    done();
-                }, function(err){
-                    done(err);
-                });
-                wdCt.should.not.equal(null);
-            });
-
             it('should stop after each commands', function (done) {
-                var wdCt = new WdCT({
-                    interaction: 'test/fixture/interaction.js',
-                    testcase: 'test/fixture/testcase.csv',
-                    browsers: ['phantomjs'],
-                    debug: false,
-                    stepwise: true
-                }).then(function(){
-                    done();
-                }, function(err){
-                    done(err);
-                });
+                var logger = chai.spy(function(){}),
+                    wdCt = new WdCT({
+                        interaction: 'test/fixture/interaction.js',
+                        testcase: 'test/fixture/testcase.csv',
+                        browsers: ['phantomjs'],
+                        debug: false,
+                        stepwise: true,
+                        logger: logger
+                    }).then(function(){
+                        // prompt should be call 8 times.
+                        logger.should.have.been.called.exactly(8);
+                        done();
+                    }, function(err){
+                        done(err);
+                    });
                 wdCt.should.not.equal(null);
             });
         });
