@@ -163,7 +163,7 @@ if(opts.get('scaffold')){
 
   var startColumn = opts.get('start-column');
   if(startColumn){
-    options.startColumn = startColumn;
+    options.startColumn = Number(startColumn);
   }
 
   var errorScreenshot = opts.get('error-screenshot');
