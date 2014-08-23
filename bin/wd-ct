@@ -46,14 +46,19 @@ opts.parse([
     'description': 'Stepwise execution'
   },
   {
+    'short': 'pe',
+    'long': 'pause-on-error',
+    'description': 'Pause on error'
+  },
+  {
     'short': 'sc',
-    'long': 'startcolumn',
+    'long': 'start-column',
     'description': 'Interation start column index number should be set',
     'value': true
   },
   {
     'short': 'es',
-    'long': 'errorscreenshot',
+    'long': 'error-screenshot',
     'description': 'Capture page when error occurred. please set captured image directory path',
     'value': true
   },
@@ -107,7 +112,8 @@ if(opts.get('scaffold')){
   }, function(err, results){
     if(results.ok_to_create_testcase) {
       fs.createReadStream(__dirname+'/../template/testcase.csv').pipe(fs.createWriteStream(results.testcase));
-    } else if(results.ok_to_create_interaction){
+    }
+    if(results.ok_to_create_interaction){
       fs.createReadStream(__dirname+'/../template/interaction.js').pipe(fs.createWriteStream(results.interaction));
     }
   });
@@ -155,11 +161,25 @@ if(opts.get('scaffold')){
     options.stepwise = true;
   }
 
-  var startColumn = opts.get('startcolumn');
+  var startColumn = opts.get('start-column');
   if(startColumn){
     options.startColumn = startColumn;
   }
 
+  var errorScreenshot = opts.get('error-screenshot');
+  if(errorScreenshot){
+    options.errorScreenshot = errorScreenshot;
+  }
+
+  var pauseOnError = opts.get('pause-on-error');
+  if(pauseOnError){
+    options.pauseOnError = pauseOnError;
+  }
+
+  var force = opts.get('force');
+  if(force){
+    options.force = true;
+  }
 
   var WdCT = require('../src/wd-ct');
   new WdCT( options );

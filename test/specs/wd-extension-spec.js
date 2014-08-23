@@ -14,18 +14,17 @@
     chai.should();
 
     before(function(done){
-        var Site = require('../helpers/setup-site');
-        site = new Site();
-
-        server = new SeleniumServer();
-        server.on('start', function(){
-            site.close();
-            done();
-        });
-
         prompt.override = {
             breakpoint: ' '
         };
+
+        server = new SeleniumServer();
+        server.on('start', function(){
+
+            var Site = require('../helpers/setup-site');
+            site = new Site();
+            done();
+        });
 
     });
 

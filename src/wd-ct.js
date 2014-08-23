@@ -33,8 +33,11 @@ var WdCT = function(options){
       stepwise,
       startColumn,
       errorScreenshot,
+      pauseOnError,
       force,
-      logger,
+      debugLogger,
+      errorLogger,
+      promptLogger,
       wdCtDefer = Q.defer();
 
   options = _.extend({
@@ -47,9 +50,12 @@ var WdCT = function(options){
     proxy: undefined,
     stepwise: undefined,
     errorScreenshot: false,
+    pauseOnError: false,
     force: false,
     startColumn: 0,
-    logger: console.log
+    debugLogger: console.log,
+    errorLogger: console.log,
+    promptLogger: console.log
   }, options);
 
   testcase = options.testcase;
@@ -57,17 +63,20 @@ var WdCT = function(options){
   stepwise = options.stepwise;
   startColumn = options.startColumn;
   errorScreenshot = options.errorScreenshot;
+  pauseOnError = options.pauseOnError;
   force = options.force;
-  logger = options.logger;
+  debugLogger = options.debugLogger;
+  errorLogger = options.errorLogger;
+  promptLogger = options.promptLogger;
   debug = options.debug ? function(){
-    logger.apply(logger, arguments);
+    debugLogger.apply(debugLogger, arguments);
   } : function(){};
   error = options.error ? function(){
-    logger.apply(logger, arguments);
+    errorLogger.apply(errorLogger, arguments);
   } : function(){};
 
   // Apply wd-extension
-  require('./wd-extension')(wd, webdriver, store, logger);
+  require('./wd-extension')(wd, webdriver, store, promptLogger);
 
   // Apply colors to console.log
   var colors = require('colors');
@@ -190,21 +199,41 @@ var WdCT = function(options){
                 promise = promise.then(function(){
                   return fn.apply( browser, [val, store]);                  
                 }, function(err){
-                  var filename;
-                  if(errorScreenshot) {
-                    filename = path.join( errorScreenshot, + new Date().getTime()+'.png');
-                    browser.takeScreenshot()
-                           .then(function(screenshot){
-                               fs.writeFileSync(filename, new Buffer( screenshot, 'base64').toString('binary'), 'binary');
-                           });
-                    errorScreenshot = false;
-                    err.message += ' capture[ '+filename+' ]';
+                  var filename,
+                      throwError = function(err){
+                        if(!force) {
+                          throw err;
+                        } else {
+                          error(err.message.red);
+                        }
+                      },
+                      defer = Q.defer(),
+                      breakPromise = defer.promise;
+
+                  if(pauseOnError) {
+                    breakPromise = breakPromise.then(function(){
+                      return browser.break();
+                    });
+                    if(!force){
+                      pauseOnError = false;
+                    }
                   }
-                  if(!force) {
-                    throw err;
-                  } else {
-                    error(err.message.red);
-                  }
+
+                  breakPromise = breakPromise.then(function(){
+                    if(errorScreenshot) {
+                      filename = path.join( errorScreenshot, + new Date().getTime()+'.png');
+                      return browser.takeScreenshot()
+                                    .then(function(screenshot){
+                                        fs.writeFileSync(filename, new Buffer( screenshot, 'base64').toString('binary'), 'binary');
+                                        errorScreenshot = false;
+                                        err.message += ' capture[ '+filename+' ]';
+                                        throwError(err);
+                                    });
+                    }
+                    throwError(err);
+                  });
+                  defer.resolve();
+                  return breakPromise;
                 });
 
                 if(stepwise){

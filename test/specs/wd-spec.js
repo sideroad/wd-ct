@@ -1,4 +1,4 @@
-/* global describe, it, before, after */
+/* global describe, it, before */
 
 (function () {
     'use strict';
@@ -14,15 +14,12 @@
     before(function(done){
         var Site = require('../helpers/setup-site');
         site = new Site();
-        done();
 
         prompt.override = {
             breakpoint: ' '
         };
-    });
 
-    after(function(){
-        site.close();
+        done();
     });
 
     describe('WbCT', function () {
@@ -83,13 +80,13 @@
                 wdCt.should.not.equal(null);
             });
             it('should fail and interrupted', function (done) {
-                var logger = chai.spy(function(){}),
+                var errorLogger = chai.spy(function(){}),
                     wdCt = new WdCT({
                         interaction: 'test/fixture/interaction-failed.js',
                         testcase: 'test/fixture/testcase.csv',
                         browsers: ['phantomjs'],
                         debug: false,
-                        logger: logger,
+                        errorLogger: errorLogger,
                         errorScreenshot: 'capture'
                     }).then(function(){
                         done('should fail');
@@ -99,23 +96,23 @@
                         err.should.have.property('message').to.match(expected);
 
                         // error should be occurred once.
-                        logger.should.have.been.called.once;
+                        errorLogger.should.have.been.called.once;
                         done();
                     });
                 wdCt.should.not.equal(null);
             });
             it('should continue test even through error occurred', function (done) {
-                var logger = chai.spy(function(){}),
+                var errorLogger = chai.spy(function(){}),
                     wdCt = new WdCT({
                         interaction: 'test/fixture/interaction-failed.js',
                         testcase: 'test/fixture/testcase.csv',
                         browsers: ['phantomjs'],
                         debug: false,
-                        logger: logger,
+                        errorLogger: errorLogger,
                         force: true
                     }).then(function(){
                         // error should be occurred twice.
-                        logger.should.have.been.called.twice;
+                        errorLogger.should.have.been.called.twice;
                         done();
                     }, function(err){
                         done(err);
@@ -140,20 +137,48 @@
         });
         describe('execute with breakpoint', function () {
             it('should stop after each commands', function (done) {
-                var logger = chai.spy(function(){}),
+                var promptLogger = chai.spy(function(){}),
                     wdCt = new WdCT({
                         interaction: 'test/fixture/interaction.js',
                         testcase: 'test/fixture/testcase.csv',
                         browsers: ['phantomjs'],
                         debug: false,
                         stepwise: true,
-                        logger: logger
+                        promptLogger: promptLogger
                     }).then(function(){
                         // prompt should be call 8 times.
-                        logger.should.have.been.called.exactly(8);
+                        promptLogger.should.have.been.called.exactly(8);
                         done();
                     }, function(err){
                         done(err);
+                    });
+                wdCt.should.not.equal(null);
+            });
+            it('should stop when error happend', function (done) {
+                var promptLogger = chai.spy(function(){}),
+                    errorLogger = chai.spy(function(){}),
+                    wdCt = new WdCT({
+                        interaction: 'test/fixture/interaction-failed.js',
+                        testcase: 'test/fixture/testcase.csv',
+                        browsers: ['phantomjs'],
+                        debug: false,
+                        pauseOnError: true,
+                        promptLogger: promptLogger,
+                        errorLogger: errorLogger
+                    }).then(function(){
+                        done('should fail');
+                    }, function(err){
+                        err.should.have.property('message').equal(
+                            "expected \'http://localhost:8000/index.html?text=abcde\' to equal "+
+                                     "\'http://localhost:8000/index.html?aaa=bbb\'");
+
+                        // prompt should be call only once.
+                        promptLogger.should.have.been.called.once;
+
+                        // error should be occurred only once.
+                        errorLogger.should.have.been.called.once;
+
+                        done();
                     });
                 wdCt.should.not.equal(null);
             });
