@@ -1,6 +1,8 @@
 'use strict';
 
 module.exports = function(grunt) {
+  var fs = require('fs');
+
   grunt.initConfig({
     clean: ['capture/*'],
     jshint: {
@@ -36,6 +38,10 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-mocha-cov');
   grunt.registerTask('test', ['clean', 'mochacov:test']);
   grunt.registerTask('coverage', ['mochacov:coverage']);
+
+  if(!fs.existsSync('capture')){
+    fs.mkdirSync('capture');
+  }
 
   grunt.registerTask('ci', ['mochacov:test', 'mochacov:coverage']);
   grunt.registerTask('default', ['clean', 'jshint', 'mochacov:test']);
