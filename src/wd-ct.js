@@ -146,7 +146,24 @@ var WdCT = function(options){
         function loadTestCase(callback){
           var header = [],
               body = [],
-              suffix = testcase.match(/\.(.+)$/)[1];
+              suffix = testcase.match(/\.(.+)$/)[1],
+              trimEmpty = function(err, header, body){
+                var findLastIndex = function(line){
+                      return _.findLastIndex(line, function(val){
+                        return val !== undefined && val !== null && val === val && val !== '';
+                      });
+                    },
+                    last = findLastIndex(header);
+
+                header = header.slice(0, last+1);
+                body = _.chain( body )
+                        .map(function(line){
+                          return findLastIndex(line) === -1 ? false : line.slice(0, last+1);
+                        })
+                        .compact().value();
+
+                callback(err, header, body);
+              };
 
           if(suffix === 'csv'){
             csv
@@ -162,7 +179,7 @@ var WdCT = function(options){
                 body.push(data);
               })
               .on("end", function(){
-                callback(null, header, body);
+                trimEmpty(null, header, body);
               });
           } else if(suffix === 'xlsx') {
             _.each(xlsx.parse(testcase).worksheets[0].data, function(data, row){
@@ -178,7 +195,7 @@ var WdCT = function(options){
                   return obj.value;
                 }));
             });
-            callback(null, header, body);
+            trimEmpty(null, header, body);
           } else if(suffix === 'xls') {
             (function(){
               var workbook = XLS.readFile(testcase),
@@ -187,7 +204,7 @@ var WdCT = function(options){
 
               header = data.shift();
               body = data;
-              callback(null, header, body);
+              trimEmpty(null, header, body);
             })();
           }
         },
