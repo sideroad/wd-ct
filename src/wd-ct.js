@@ -71,8 +71,14 @@ var WdCT = function(options){
   debug = options.debug ? function(){
     debugLogger.apply(debugLogger, arguments);
   } : function(){};
-  error = options.error ? function(){
-    errorLogger.apply(errorLogger, arguments);
+  error = options.error ? function(err){
+    var mes = err.message;
+    mes += err.col ? '\n column['+err.col+']' : '';
+    mes += err.row ? '\n row['+err.row+']' : '';
+    mes += err.command ? '\n command['+err.command+']' : '';
+    mes += err.val ? '\n val['+err.val+']' : '';
+
+    errorLogger.apply(errorLogger, [mes.red]);
   } : function(){};
 
   // Apply wd-extension
@@ -186,11 +192,13 @@ var WdCT = function(options){
           }
         },
         function execute(header, body, callback){
-          var queue = function(command, fn, val){
+          var queue = function(command, fn, val, col, row){
                 if(!fn){
                   promise = promise.then(function(){
                     var err = new Error();
-                    err.message = 'Command not exists in script: '+command;
+                    err.message = 'Command not exists in script.';
+                    err.col = col;
+                    err.command = command;
                     throw err;
                   });
                   return;
@@ -198,20 +206,29 @@ var WdCT = function(options){
 
                 promise = promise.then(function(){
                   return fn.apply( browser, [val, store]);                  
-                }, function(err){
+                });
+
+                promise = promise.fail(function(err){
                   var filename,
                       throwError = function(err){
                         if(!force) {
                           throw err;
                         } else {
-                          error(err.message.red);
+                          error(err);
                         }
                       },
                       defer = Q.defer(),
-                      breakPromise = defer.promise;
+                      errorPromise = defer.promise;
+
+                  if(!err.col){
+                    err.col = col;
+                    err.row = row;
+                    err.command = command;
+                    err.val = err.val;
+                  }
 
                   if(pauseOnError) {
-                    breakPromise = breakPromise.then(function(){
+                    errorPromise = errorPromise.then(function(){
                       return browser.break();
                     });
                     if(!force){
@@ -219,7 +236,7 @@ var WdCT = function(options){
                     }
                   }
 
-                  breakPromise = breakPromise.then(function(){
+                  errorPromise = errorPromise.then(function(){
                     if(errorScreenshot) {
                       filename = path.join( errorScreenshot, + new Date().getTime()+'.png');
                       return browser.takeScreenshot()
@@ -233,7 +250,7 @@ var WdCT = function(options){
                     throwError(err);
                   });
                   defer.resolve();
-                  return breakPromise;
+                  return errorPromise;
                 });
 
                 if(stepwise){
@@ -250,20 +267,20 @@ var WdCT = function(options){
           // remove assert header column
           header.pop();
 
-          _.each(body, function(data){
+          _.each(body, function(data, row){
             var assert;
 
             data = _.rest(data, startColumn);
             assert = data[data.length -1];
 
             // queuing input interaction
-            header.forEach(function(key, index){
-              var val = data[index];
-              queue( key, commands.input[key], val);
+            header.forEach(function(key, col){
+              var val = data[col];
+              queue( key, commands.input[key], val, col + startColumn + 1, row + 2);
             });
 
             // queuing assertion interaction
-            queue( assert, commands.assertion[assert] );
+            queue( assert, commands.assertion[assert], '', header.length + startColumn + 1, row + 2 );
           });
           callback();
         }
@@ -278,7 +295,7 @@ var WdCT = function(options){
         promise.then(function(){
           teadown();
         },function(err){
-          error(err.message.red);
+          error(err);
           teadown( force ? undefined : err);
         }).done();
       });
