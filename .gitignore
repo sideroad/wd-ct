@@ -1,3 +1,4 @@
 node_modules
-capture
+tmp/*.*
+!tmp/.gitkeep
 .DS_Store

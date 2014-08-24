@@ -2,8 +2,6 @@
 
 // Run WdCT.
 var opts = require('opts'),
-    prompt = require('prompt'),
-    fs = require('fs'),
     options = {};
 
 opts.parse([
@@ -75,50 +73,8 @@ opts.parse([
 ]);
 
 if(opts.get('scaffold')){
-  prompt.message = '';
-  prompt.message = '';
-  prompt.start();
-  prompt.get({
-    properties: {
-      ok_to_create_testcase: {
-        pattern: /^y|n$/,
-        description: 'Are you sure you want to generate testcase? (y / n)',
-        default: 'y',
-        required: true,
-        delimiter: ':'
-      },
-      testcase: {
-        pattern: /^.*\.(csv|xls|xlsx)$/,
-        description: 'Input testcase file name.( csv, xls, xlsx extension is permitted )',
-        default: 'testcase.csv',
-        required: true,
-        delimiter: ':'
-      },
-      ok_to_create_interaction: {
-        pattern: /^y|n$/,
-        description: 'Are you sure you want to generate interaction.js? (y / n)',
-        default: 'y',
-        required: true,
-        delimiter: ':'
-      },
-      interaction: {
-        pattern: /^.*\.js$/,
-        description: 'Input interaction script name',
-        default: 'interaction.js',
-        required: true,
-        delimiter: ':'
-      }
-    }
-  }, function(err, results){
-    if(results.ok_to_create_testcase) {
-      fs.createReadStream(__dirname+'/../template/testcase.csv').pipe(fs.createWriteStream(results.testcase));
-    }
-    if(results.ok_to_create_interaction){
-      fs.createReadStream(__dirname+'/../template/interaction.js').pipe(fs.createWriteStream(results.interaction));
-    }
-  });
-  
-
+  var WdCTScaffold = require('../src/wd-ct-scaffold');
+  new WdCTScaffold();
 } else {
 
   options.testcase = opts.get('testcase');

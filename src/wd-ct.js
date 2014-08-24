@@ -14,13 +14,11 @@ var async = require('async'),
     fs = require('fs'),
     chaiAsPromised = require('chai-as-promised'),
     Q = require('q'),
-    csv = require('fast-csv'),
-    xlsx = require('node-xlsx'),
-    XLS = require('xlsjs'),
     wd = require('wd'),
     path = require('path'),
     webdriver = require('wd/lib/webdriver'),
     SeleniumServer = require('./setup-server'),
+    loadTestcase = require('./load-testcase'),
     browser,
     store = {};
 
@@ -141,72 +139,7 @@ var WdCT = function(options){
       async.waterfall([
         function registerInteraction(callback){
           commands = require(process.cwd()+'/'+interaction)(wd, store);
-          callback();
-        },
-        function loadTestCase(callback){
-          var header = [],
-              body = [],
-              suffix = testcase.match(/\.(.+)$/)[1],
-              trimEmpty = function(err, header, body){
-                var findLastIndex = function(line){
-                      return _.findLastIndex(line, function(val){
-                        return val !== undefined && val !== null && val === val && val !== '';
-                      });
-                    },
-                    last = findLastIndex(header);
-
-                header = header.slice(0, last+1);
-                body = _.chain( body )
-                        .map(function(line){
-                          return findLastIndex(line) === -1 ? false : line.slice(0, last+1);
-                        })
-                        .compact().value();
-
-                callback(err, header, body);
-              };
-
-          if(suffix === 'csv'){
-            csv
-              .fromPath(testcase)
-              .on("record", function(data, row){
-
-                // Header should be ignore
-                if(row === 0){
-                  header = data;
-                  return;
-                }
-
-                body.push(data);
-              })
-              .on("end", function(){
-                trimEmpty(null, header, body);
-              });
-          } else if(suffix === 'xlsx') {
-            _.each(xlsx.parse(testcase).worksheets[0].data, function(data, row){
-                // Header should be ignore
-                if(row === 0){
-                  header = _.map(data, function(obj){
-                    return obj.value;
-                  });
-                  return;
-                }
-
-                body.push( _.map(data, function(obj){
-                  return obj.value;
-                }));
-            });
-            trimEmpty(null, header, body);
-          } else if(suffix === 'xls') {
-            (function(){
-              var workbook = XLS.readFile(testcase),
-                  worksheet = workbook.Sheets[ workbook.SheetNames[0] ],
-                  data = XLS.utils.sheet_to_json( worksheet, {header: 1} );
-
-              header = data.shift();
-              body = data;
-              trimEmpty(null, header, body);
-            })();
-          }
+          loadTestcase(testcase, startColumn, callback);
         },
         function execute(header, body, callback){
           var queue = function(command, fn, val, col, row){
@@ -277,12 +210,6 @@ var WdCT = function(options){
                 }
 
               };
-
-          // start column index
-          header = _.rest(header, startColumn);
-
-          // remove assert header column
-          header.pop();
 
           _.each(body, function(data, row){
             var assert;

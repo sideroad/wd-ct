@@ -11,18 +11,19 @@
     chai.use(spies);
     chai.should();
 
-    before(function(done){
-        var Site = require('../helpers/setup-site');
-        site = new Site();
-
-        prompt.override = {
-            breakpoint: ' '
-        };
-
-        done();
-    });
-
     describe('WbCT', function () {
+
+        before(function(done){
+            var Site = require('../helpers/setup-site');
+            site = new Site();
+
+            prompt.override = {
+                breakpoint: ' '
+            };
+
+            done();
+        });
+
 	    var WdCT = require('../../src/wd-ct');
 
         describe('execute test', function () {
@@ -83,7 +84,7 @@
                     browsers: ['phantomjs'],
                     debug: false,
                     errorLogger: errorLogger,
-                    errorScreenshot: 'capture'
+                    errorScreenshot: 'tmp'
                 }).then(function(){
                     throw new Error('should fail');
                 }, function(err){

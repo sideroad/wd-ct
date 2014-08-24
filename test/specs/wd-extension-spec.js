@@ -13,34 +13,34 @@
     chai.use(spies);
     chai.should();
 
-    before(function(done){
-        prompt.override = {
-            breakpoint: ' '
-        };
+    describe('addPromiseChainMethod', function () {
 
-        server = new SeleniumServer();
-        server.on('start', function(){
+        before(function(done){
+            prompt.override = {
+                breakpoint: ' '
+            };
+            server = new SeleniumServer();
+            server.on('start', function(){
 
-            var Site = require('../helpers/setup-site');
-            site = new Site();
+                var Site = require('../helpers/setup-site');
+                site = new Site();
+                done();
+            });
+        });
+        after(function(done){
+            server.kill();
             done();
         });
 
-    });
 
-    after(function(done){
-    	server.kill();
-    	done();
-    });
-
-    describe('addPromiseChainMethod', function () {
 	    var wd = require('wd'),
     		webdriver = require('wd/lib/webdriver'),
-    		store = {},
             breaklog = chai.spy(function(){});
 
-		require('../../src/wd-extension')(wd, webdriver, store, breaklog);
         describe('storeEval', function () {
+            var store = {};
+            require('../../src/wd-extension')(wd, webdriver, store, breaklog);
+
             it('should store executed script', function (done) {
             	var b = wd.promiseChainRemote();
                 b.init({
@@ -49,15 +49,22 @@
                  })
     	    	 .get('http://localhost:8000/')
             	 .storeEval('location', 'location.href')
-            	 .then(function(){
+            	 .then(function(store){
             	 	store.location.should.equal('http://localhost:8000/');
-            	 	b.quit();
-            		done();
-            	 });
+            	 	return b.quit();
+            	 })
+                 .done(function(){
+                    done();
+                 }, function(err){
+                    done(err);
+                 });
             });
         });
 
         describe('fireEvents', function () {
+            var store = {};
+            require('../../src/wd-extension')(wd, webdriver, store, breaklog);
+
             it('should emit events', function (done) {
                 var b = wd.promiseChainRemote();
                 b.init({
@@ -72,13 +79,20 @@
                  .text()
                  .then(function(text){
                     text.should.equal('abcde');
-                    b.quit();
+                    return b.quit();
+                 })
+                 .done(function(){
                     done();
+                 }, function(err){
+                    done(err);
                  });
             });
         });
 
         describe('break', function () {
+            var store = {};
+            require('../../src/wd-extension')(wd, webdriver, store, breaklog);
+
             it('should pause execution', function (done) {
                 var b = wd.promiseChainRemote();
                 b.init({
@@ -94,8 +108,12 @@
                  .text()
                  .then(function(text){
                     text.should.equal('abcde');
-                    b.quit();
+                    return b.quit();                    
+                 })
+                 .done(function(){
                     done();
+                 }, function(err){
+                    done(err);
                  });
             });
         });

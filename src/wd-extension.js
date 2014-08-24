@@ -17,6 +17,7 @@ module.exports = function(wd, webdriver, store, logger){
         .eval(source)
         .then(function(results){
           store[key] = results;
+          return store;
         });
     }
   );
