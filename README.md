@@ -76,6 +76,19 @@ Referrence for interaction as wd and assertion as chai.
 
 ## Advanced
 
+### Store value
+When you want to use variable after the command.
+wd-ct prepare store object for keeping variable.
+Benefit to use store object is to be able to check variable when `break` command executed.
+`break` command will be explain in next section.
+```js
+        return this.get('http://www.google.com/')
+                   .url()
+                   .then(function(url){
+                        store.url = url;
+                   })
+```
+
 ### Debugging
 
 `wd-ct` provides bunch of approach for effective debug

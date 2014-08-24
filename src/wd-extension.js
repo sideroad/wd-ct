@@ -11,25 +11,13 @@ module.exports = function(wd, webdriver, store, logger){
 
   // adding custom promise chain method
   wd.addPromiseChainMethod(
-    'storeEval',
-    function(key, source) {
-      return this
-        .eval(source)
-        .then(function(results){
-          store[key] = results;
-          return store;
-        });
-    }
-  );
-  wd.addPromiseChainMethod(
     'fireEvents',
     function(css, eventName) {
       var that = this;
-      return this
-        .elementByCss(css)
-        .then(function(el){
-          return that.execute(fireEvents, [{ELEMENT: el.value}, eventName]);
-        });
+      return this.elementByCss(css)
+                 .then(function(el){
+                    return that.execute(fireEvents, [{ELEMENT: el.value}, eventName]);
+                 });
     }
   );
   wd.addPromiseChainMethod(

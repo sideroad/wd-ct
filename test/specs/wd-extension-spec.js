@@ -36,30 +36,6 @@
 	    var wd = require('wd'),
     		webdriver = require('wd/lib/webdriver');
 
-        describe('storeEval', function () {
-            var store = {};
-            require('../../src/wd-extension')(wd, webdriver, store, function(){});
-
-            it('should store executed script', function (done) {
-            	var b = wd.promiseChainRemote();
-                b.init({
-                    browserName: 'phantomjs',
-                    port: server.port
-                 })
-    	    	 .get('http://localhost:8000/')
-            	 .storeEval('location', 'location.href')
-            	 .then(function(store){
-            	 	store.location.should.equal('http://localhost:8000/');
-            	 	return b.quit();
-            	 })
-                 .done(function(){
-                    done();
-                 }, function(err){
-                    done(err);
-                 });
-            });
-        });
-
         describe('fireEvents', function () {
             var store = {};
             require('../../src/wd-extension')(wd, webdriver, store, function(){});
@@ -101,6 +77,10 @@
                     port: server.port
                  })
                  .get('http://localhost:8000/')
+                 .url()
+                 .then(function(url){
+                    store.url = url;
+                 })
                  .break()
                  .elementByCss('#text')
                  .type('abcde')
