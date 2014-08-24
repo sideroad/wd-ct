@@ -1,5 +1,12 @@
 # WebDriver for combitorial testing[![Build Status](https://travis-ci.org/sideroad/wd-ct.svg?branch=master)](https://travis-ci.org/sideroad/wd-ct) [![Coverage Status](https://coveralls.io/repos/sideroad/wd-ct/badge.png?branch=master)](https://coveralls.io/r/sideroad/wd-ct?branch=master) [![Code Climate](https://codeclimate.com/github/sideroad/wd-ct/badges/gpa.svg)](https://codeclimate.com/github/sideroad/wd-ct)
 
+## Overview
+### testcase
+![overview-testcase](docs/testcase.png)
+
+### interaction script
+![overview-interaction](docs/interaction.png)
+
 ## Getting Started
 
 ```sh
@@ -37,7 +44,7 @@ Continue to execute test even though error occurred
     -f, --force
 Capture page when error occurred. please set captured image directory path
     -es, --error-screenshot <value>
-Interation start column index number should be set
+Input command start column index number should be set
     -sc, --start-column <value>
 Pause on error
     -pe, --pause-on-error
@@ -57,56 +64,15 @@ Target testcase file
     -t, --testcase <value>
 ```
 
-Prepare interaction.js and testcase.csv following below.
+Concreate interaction script and testcase file.
 
-#### interaction.js
+Referrence for interaction as wd and assertion as chai.
 
-Define input and assert interations
+- [wd API document](https://github.com/admc/wd/blob/master/doc/api.md)
 
-```js
-module.exports = function(wd){
-	'use strict';
-	return {
-		input: {
-			'open': function(url){
-				return this.get(url);
-			},
-			'input query': function(str){
-				return this.waitForElementByCss('#js-command-bar-field')
-				           .type(str)
-				           .fireEvents('#js-command-bar-field', 'change')
-				           .elementByCss('#top_search_form')
-				           .submit();
-			},
-			'click user menu': function(){
-				return this.waitForElementByCss('.search-menu-container ul.menu li:nth-of-type(4) a', 3000)
-				           .click();
-			},
-			'click linkage': function(href){
-                return this.waitForElementByCss('a[href="'+href+'"]', 3000)
-                           .click();
-			}
-		},
-		assertion: {
-			'should be display sideroad github page': function(){
-				return this.url().should.eventually.equal('https://github.com/sideroad');
-			},
-			'should be display gruntjs github page': function(){
-				return this.url().should.eventually.equal('https://github.com/gruntjs');
-			}
-		}
-	};
-};
-```
+- [chai document](http://chaijs.com/api/)
 
-#### testcase.csv
-
-Define testcase. Write input pattern and assertion.
-
-|open|input query|click user menu|click linkage|assert|
-|----|-----------|---------------|-------------|------|
-|https://github.com/|sideroad||/sideroad|should be display sideroad github page|
-|https://github.com/|gruntjs||/gruntjs|should be display gruntjs github page|
+- [chai as promise document](http://chaijs.com/plugins/chai-as-promised)
 
 ## Advanced
 
