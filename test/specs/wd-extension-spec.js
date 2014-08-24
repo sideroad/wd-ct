@@ -34,12 +34,11 @@
 
 
 	    var wd = require('wd'),
-    		webdriver = require('wd/lib/webdriver'),
-            breaklog = chai.spy(function(){});
+    		webdriver = require('wd/lib/webdriver');
 
         describe('storeEval', function () {
             var store = {};
-            require('../../src/wd-extension')(wd, webdriver, store, breaklog);
+            require('../../src/wd-extension')(wd, webdriver, store, function(){});
 
             it('should store executed script', function (done) {
             	var b = wd.promiseChainRemote();
@@ -63,7 +62,7 @@
 
         describe('fireEvents', function () {
             var store = {};
-            require('../../src/wd-extension')(wd, webdriver, store, breaklog);
+            require('../../src/wd-extension')(wd, webdriver, store, function(){});
 
             it('should emit events', function (done) {
                 var b = wd.promiseChainRemote();
@@ -91,9 +90,11 @@
 
         describe('break', function () {
             var store = {};
-            require('../../src/wd-extension')(wd, webdriver, store, breaklog);
 
             it('should pause execution', function (done) {
+                var breakLogger = chai.spy(function(){});
+                require('../../src/wd-extension')(wd, webdriver, store, breakLogger);
+
                 var b = wd.promiseChainRemote();
                 b.init({
                     browserName: 'phantomjs',
@@ -108,6 +109,7 @@
                  .text()
                  .then(function(text){
                     text.should.equal('abcde');
+                    breakLogger.should.have.been.called.once;
                     return b.quit();                    
                  })
                  .done(function(){
@@ -116,6 +118,50 @@
                     done(err);
                  });
             });
+
+            it('should be able to check store', function (done) {
+                var called = 0,
+                    breakLogger = chai.spy(function(){
+                                      called++;
+                                      if(called >= 2){
+                                        prompt.override = {
+                                            breakpoint: ' '
+                                        };
+                                      }
+                                  });
+                require('../../src/wd-extension')(wd, webdriver, store, breakLogger);
+
+                prompt.override = {
+                    breakpoint: 'store'
+                };
+
+                var b = wd.promiseChainRemote();
+                b.init({
+                    browserName: 'phantomjs',
+                    port: server.port
+                 })
+                 .get('http://localhost:8000/')
+                 .break()
+                 .elementByCss('#text')
+                 .type('abcde')
+                 .fireEvents('#text', 'change')
+                 .elementByCss('#logger')
+                 .text()
+                 .then(function(text){
+                    // 'Input command or press enter to continue.'
+                    // {}
+                    // 'Input command or press enter to continue.'
+                    breakLogger.should.have.been.called.exactly(3);
+                    text.should.equal('abcde');
+                    return b.quit();                    
+                 })
+                 .done(function(){
+                    done();
+                 }, function(err){
+                    done(err);
+                 });
+            });
+
         });
 
     });	

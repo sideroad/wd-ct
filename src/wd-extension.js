@@ -51,10 +51,6 @@ module.exports = function(wd, webdriver, store, logger){
             matched,
             variable;
 
-        if(err) {
-          throw err;
-        }
-
         if( !text ) {
           defer.resolve(that);
         } else {
