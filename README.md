@@ -5,10 +5,16 @@
 ```sh
 $ npm install -g wd-ct
 $ wd-ct -s
-prompt: Are you ok to generate interaction.js and testcase.csv? (y / n):  y
-prompt: Input interaction script name:  (interaction.js) 
-prompt: Input testcase CSV file name:  (testcase.csv) 
-$ wd-ct -i interaction.js -t testcase.csv
+Are you sure you want to generate testcase? (y / n)
+> (n) y
+Input testcase file name.( csv, xls, xlsx extension is permitted )
+> (testcase.csv) 
+Are you sure you want to generate interaction.js? (y / n)
+> (n) y
+Input interaction script name
+> (interaction.js) 
+Input source of testcase
+> (testcase.csv) 
 ```
 
 ### Usage
@@ -27,12 +33,14 @@ $ wd-ct --help
 Usage: node /Users/sideroad/workspace/wd-ct/bin/wd-ct [options]
 Display usage
     -h, --help
+Continue to execute test even though error occurred
+    -f, --force
 Capture page when error occurred. please set captured image directory path
-    -es, --errorscreenshot <value>
+    -es, --error-screenshot <value>
 Interation start column index number should be set
-    -sc, --startcolumn <value>
-Set breakpoint after the command executed
-    -bp, --breakpoint <value>
+    -sc, --start-column <value>
+Pause on error
+    -pe, --pause-on-error
 Stepwise execution
     -sw, --stepwise
 Generate sample script and csv from template
@@ -81,10 +89,10 @@ module.exports = function(wd){
 		},
 		assertion: {
 			'should be display sideroad github page': function(){
-				return this.eval('window.location.href').should.eventually.equal('https://github.com/sideroad');
+				return this.url().should.eventually.equal('https://github.com/sideroad');
 			},
 			'should be display gruntjs github page': function(){
-				return this.eval('window.location.href').should.eventually.equal('https://github.com/gruntjs');
+				return this.url().should.eventually.equal('https://github.com/gruntjs');
 			}
 		}
 	};
@@ -99,4 +107,64 @@ Define testcase. Write input pattern and assertion.
 |----|-----------|---------------|-------------|------|
 |https://github.com/|sideroad||/sideroad|should be display sideroad github page|
 |https://github.com/|gruntjs||/gruntjs|should be display gruntjs github page|
+
+## Advanced
+
+### Debugging
+
+`wd-ct` provides bunch of approach for effective debug
+
+#### Pause options
+
+- Stepwise execution
+Will be pause after each command execution
+`wd-ct --stepwise ...`
+
+- Break on error
+Will be pause when error occurred
+`wd-ct --break-on-error ...`
+
+#### Pause command
+
+If you want to pause manually, `break` method can be used for pause.
+
+```js
+return this.get('http://www.google.com/')
+           .break()  // will be pause on here
+           .url()
+```
+
+During paused, we can check stored variable on store object.
+
+```js
+// interaction.js
+// ...
+        return this.get('http://www.google.com/')
+                   .url()
+                   .then(function(url){
+                        store.url = url;
+                   })
+                   .break();
+// ...
+```
+
+Debugging console log is below.
+```sh
+Input command or press enter to continue.
+> store
+{ url: 'https://www.google.co.jp/?gfe_rd=cr&ei=zZX5U-iUJOiT8QequICIBA&gws_rd=ssl' }
+Input command or press enter to continue.
+> store.url
+https://www.google.co.jp/?gfe_rd=cr&ei=zZX5U-iUJOiT8QequICIBA&gws_rd=ssl
+Input command or press enter to continue.
+> 
+```
+
+#### Other options for debug
+
+- Capture page when error occurred
+`wd-ct --error-screenshot ...`
+
+- Continue to execute test even though error occurred
+`wd-ct --force ...`
 
