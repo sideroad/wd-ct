@@ -1,0 +1,3 @@
+open,input query,click user menu,click linkage,assert
+https://github.com/,sideroad,,/sideroad,should be display sideroad github page
+https://github.com/,gruntjs,,/gruntjs,should be display gruntjs github page

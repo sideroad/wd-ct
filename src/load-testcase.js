@@ -32,9 +32,11 @@ module.exports = function (testcase, startColumn, callback){
         callback(err, header, body);
       };
 
-  if(suffix === 'csv'){
+  if(suffix === 'csv' || suffix === 'tsv'){
     csv
-      .fromPath(testcase)
+      .fromPath(testcase, {
+        delimiter: suffix === 'tsv' ? '\t' : ','
+      })
       .on("record", function(data, row){
 
         // Header should be ignore

@@ -209,13 +209,23 @@ var WdCT = function(options){
                   });
                 }
 
-              };
+              },
+              beforeEach = commands.beforeEach,
+              afterEach = commands.afterEach;
+
+          if(commands.before) {
+            queue('before', commands.before, '', null, null);
+          }
 
           _.each(body, function(data, row){
-            var assert;
+            var asserts;
+
+            if(beforeEach) {
+              queue('beforeEach', beforeEach, '', null, null);
+            }
 
             data = _.rest(data, startColumn);
-            assert = data[data.length -1];
+            asserts = data[data.length -1];
 
             // queuing input interaction
             header.forEach(function(key, col){
@@ -224,8 +234,19 @@ var WdCT = function(options){
             });
 
             // queuing assertion interaction
-            queue( assert, commands.assertion[assert], '', header.length + startColumn + 1, row + 2 );
+            asserts.split('\n\n').forEach(function(assert){
+              queue( assert, commands.assertion[assert], '', header.length + startColumn + 1, row + 2 );
+            });
+
+            if(afterEach) {
+              queue('afterEach', afterEach, '', null, null);
+            }
           });
+
+          if(commands.after) {
+            queue('after', commands.after, '', null, null);
+          }
+
           callback();
         }
       ], function(){

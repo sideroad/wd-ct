@@ -36,7 +36,7 @@ opts.parse([
   {
     'short': 's',
     'long': 'scaffold',
-    'description': 'Generate sample script and csv from template'
+    'description': 'Generate interaction script and testcase file from template'
   },
   {
     'short': 'sw',

@@ -4,20 +4,31 @@ module.exports = function(wd, webdriver, store, logger){
       path = require('path'),
       Q = require('q'),
       prompt = require('prompt'),
-      fireEvents = fs.readFileSync( path.join( __dirname, '/fire-events.js'), 'utf8').toString();
+      fire = fs.readFileSync( path.join( __dirname, '/fire.js'), 'utf8').toString();
 
   prompt.message = '';
   prompt.delimiter = '';
 
   // adding custom promise chain method
-  wd.addPromiseChainMethod(
-    'fireEvents',
-    function(css, eventName) {
+  wd.addElementPromiseChainMethod(
+    'fire',
+    function(eventName) {
       var that = this;
-      return this.elementByCss(css)
-                 .then(function(el){
-                    return that.execute(fireEvents, [{ELEMENT: el.value}, eventName]);
+      return this.browser.execute(fire, [{ELEMENT: this.value}, eventName])
+                 .then(function(){
+                  return that;
                  });
+    }
+  );
+    // adding custom promise chain method
+  wd.addElementPromiseChainMethod(
+    'naturalType',
+    function(val) {
+      return this.fire('focus')
+                 .clear()
+                 .type(val)
+                 .fire('change')
+                 .fire('blur');
     }
   );
   wd.addPromiseChainMethod(

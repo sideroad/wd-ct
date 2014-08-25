@@ -147,3 +147,29 @@ Input command or press enter to continue.
 - Continue to execute test even though error occurred
 `wd-ct --force ...`
 
+### Additional methods
+
+wd-ct provides additional wd methods.
+#### fire
+Fire event for specified DOM element
+```js
+return this.elementByCss('#foo')
+           .fire('change')
+```
+
+#### naturalType
+This is a alias to emulate typing below
+```js
+return this.elementByCss('input[type="text"]')
+           .naturalType('foo')
+```
+is same as 
+```js
+return this.elementByCss('input[type="text"]')
+           .fire('focus')
+           .clear()
+           .type('foo')
+           .fire('change')
+           .fire('blur')
+```
+

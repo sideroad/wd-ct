@@ -39,6 +39,18 @@
                     done(err);
                 });
             });
+            it('should succeed TSV test', function (done) {
+                new WdCT({
+                    interaction: 'test/fixture/interaction.js',
+                    testcase: 'test/fixture/testcase.tsv',
+                    browsers: ['phantomjs'],
+                    debug: false
+                }).done(function(){
+                    done();
+                }, function(err){
+                    done(err);
+                });
+            });
             it('should succeed xlsx test', function (done) {
                 new WdCT({
                     interaction: 'test/fixture/interaction.js',

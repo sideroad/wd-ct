@@ -36,11 +36,11 @@
 	    var wd = require('wd'),
     		webdriver = require('wd/lib/webdriver');
 
-        describe('fireEvents', function () {
+        describe('fire', function () {
             var store = {};
             require('../../src/wd-extension')(wd, webdriver, store, function(){});
 
-            it('should emit events', function (done) {
+            it('should fire events', function (done) {
                 var b = wd.promiseChainRemote();
                 b.init({
                     browserName: 'phantomjs',
@@ -49,11 +49,41 @@
                  .get('http://localhost:8000/')
                  .elementByCss('#text')
                  .type('abcde')
-                 .fireEvents('#text', 'change')
+                 .fire('change')
                  .elementByCss('#logger')
                  .text()
-                 .then(function(text){
-                    text.should.equal('abcde');
+                 .should.eventually.equal('abcde')
+                 .done(function(){
+                    done();
+                 }, function(err){
+                    done(err);
+                 });
+            });
+        });
+
+        describe('naturalType', function () {
+            var store = {};
+            require('../../src/wd-extension')(wd, webdriver, store, function(){});
+
+            it('should type and fire events', function (done) {
+                var b = wd.promiseChainRemote();
+
+                b.init({
+                    browserName: 'phantomjs',
+                    port: server.port
+                 })
+                 .get('http://localhost:8000/')
+                 .elementByCss('#text')
+                 .naturalType('abcde')
+                 .elementByCss('#logger')
+                 .text()
+                 .should.eventually.equal('abcde')
+                 .elementByCss('#text')
+                 .naturalType('12345')
+                 .elementByCss('#logger')
+                 .text()
+                 .should.eventually.equal('12345')
+                 .then(function(){
                     return b.quit();
                  })
                  .done(function(){
@@ -84,7 +114,7 @@
                  .break()
                  .elementByCss('#text')
                  .type('abcde')
-                 .fireEvents('#text', 'change')
+                 .fire('change')
                  .elementByCss('#logger')
                  .text()
                  .then(function(text){
@@ -124,7 +154,7 @@
                  .break()
                  .elementByCss('#text')
                  .type('abcde')
-                 .fireEvents('#text', 'change')
+                 .fire('change')
                  .elementByCss('#logger')
                  .text()
                  .then(function(text){

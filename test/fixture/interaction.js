@@ -8,7 +8,7 @@ module.exports = function(wd){
       'input text': function(str){
         return this.waitForElementByCss('#text')
                    .type(str)
-                   .fireEvents('#text', 'change');
+                   .fire('change');
       },
       'submit': function(){
         return this.elementByCss('#submit')

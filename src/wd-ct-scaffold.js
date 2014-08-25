@@ -6,6 +6,7 @@ module.exports = function(options, callback){
       Mustache = require('mustache'),
       template = fs.readFileSync(__dirname+'/../template/interaction.tpl', 'utf-8'),
       loadTestcase = require('./load-testcase'),
+      testcaseRegExp = /^.*\.(csv|tsv|xls|xlsx)$/,
       logger;
 
   options = _.extend({
@@ -31,22 +32,29 @@ module.exports = function(options, callback){
         }
       }, function(err, results){
         if(results.ok_to_create_testcase === 'y') {
-          logger('Input testcase file name.( csv, xls, xlsx extension is permitted )');
+          logger('Input testcase file name.( csv, tsv, xls, xlsx extension is permitted )');
           prompt.get({
             properties: {
               testcase: {
-                pattern: /^.*\.(csv|xls|xlsx)$/,
+                pattern: testcaseRegExp,
                 description: '>',
                 default: 'testcase.csv',
                 required: true
               }
             }
           }, function(err, results){
-            var ext = results.testcase.match(/^.*\.(csv|xls|xlsx)$/)[1];
+            var ext = results.testcase.match(testcaseRegExp)[1];
 
             if(ext === 'csv'){
               fs.createReadStream(__dirname+'/../template/testcase.csv').pipe(fs.createWriteStream(results.testcase));
+            } else if(ext === 'tsv'){
+              fs.createReadStream(__dirname+'/../template/testcase.tsv').pipe(fs.createWriteStream(results.testcase));
+            } else if(ext === 'xls'){
+              fs.createReadStream(__dirname+'/../template/testcase.xls').pipe(fs.createWriteStream(results.testcase));
+            } else if(ext === 'xlsx'){
+              fs.createReadStream(__dirname+'/../template/testcase.xlsx').pipe(fs.createWriteStream(results.testcase));
             }
+
             callback();
           });
         } else {
@@ -83,7 +91,7 @@ module.exports = function(options, callback){
             prompt.get({
               properties: {
                 source: {
-                  pattern: /^.*\.(csv|xls|xlsx)$/,
+                  pattern: testcaseRegExp,
                   description: '>',
                   default: 'testcase.csv',
                   conform: function(source){
