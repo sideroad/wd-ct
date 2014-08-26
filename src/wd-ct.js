@@ -16,9 +16,9 @@ var async = require('async'),
     Q = require('q'),
     wd = require('wd'),
     path = require('path'),
-    webdriver = require('wd/lib/webdriver'),
     SeleniumServer = require('./setup-server'),
     loadTestcase = require('./load-testcase'),
+    wdExtension = require('./wd-extension'),
     browser,
     store = {};
 
@@ -80,7 +80,7 @@ var WdCT = function(options){
   } : function(){};
 
   // Apply wd-extension
-  require('./wd-extension')(wd, webdriver, store, promptLogger);
+  wdExtension.adapt(wd, store, promptLogger);
 
   // Apply colors to console.log
   var colors = require('colors');
@@ -234,7 +234,7 @@ var WdCT = function(options){
             });
 
             // queuing assertion interaction
-            asserts.split('\n\n').forEach(function(assert){
+            asserts.split(/\r?\n\r?\n/).forEach(function(assert){
               queue( assert, commands.assertion[assert], '', header.length + startColumn + 1, row + 2 );
             });
 

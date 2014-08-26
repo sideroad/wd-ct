@@ -7,6 +7,7 @@
      	chai = require('chai'),
         spies = require('chai-spies'),
         prompt = require('prompt'),
+        wdExtension = require('../../src/wd-extension'),
      	server,
         site;
 
@@ -33,12 +34,11 @@
         });
 
 
-	    var wd = require('wd'),
-    		webdriver = require('wd/lib/webdriver');
-
         describe('fire', function () {
-            var store = {};
-            require('../../src/wd-extension')(wd, webdriver, store, function(){});
+            var store = {},
+                wd = require('wd');
+
+            wdExtension.adapt(wd, store, function(){});
 
             it('should fire events', function (done) {
                 var b = wd.promiseChainRemote();
@@ -62,8 +62,10 @@
         });
 
         describe('naturalType', function () {
-            var store = {};
-            require('../../src/wd-extension')(wd, webdriver, store, function(){});
+            var store = {},
+                wd = require('wd');
+
+            wdExtension.adapt(wd, store, function(){});
 
             it('should type and fire events', function (done) {
                 var b = wd.promiseChainRemote();
@@ -98,8 +100,10 @@
             var store = {};
 
             it('should pause execution', function (done) {
-                var breakLogger = chai.spy(function(){});
-                require('../../src/wd-extension')(wd, webdriver, store, breakLogger);
+                var breakLogger = chai.spy(function(){}),
+                    wd = require('wd');
+
+                wdExtension.adapt(wd, store, breakLogger);
 
                 var b = wd.promiseChainRemote();
                 b.init({
@@ -119,6 +123,7 @@
                  .text()
                  .then(function(text){
                     text.should.equal('abcde');
+                    // 'Input command or press enter to continue.'
                     breakLogger.should.have.been.called.once;
                     return b.quit();                    
                  })
@@ -133,13 +138,19 @@
                 var called = 0,
                     breakLogger = chai.spy(function(){
                                       called++;
-                                      if(called >= 2){
+                                      if(called === 3){
+                                        prompt.override = {
+                                            breakpoint: 'store.url'
+                                        };
+                                      } else if (called >= 5){
                                         prompt.override = {
                                             breakpoint: ' '
                                         };
                                       }
-                                  });
-                require('../../src/wd-extension')(wd, webdriver, store, breakLogger);
+                                  }),
+                    wd = require('wd');
+                    
+                wdExtension.adapt(wd, store, breakLogger);
 
                 prompt.override = {
                     breakpoint: 'store'
@@ -151,6 +162,10 @@
                     port: server.port
                  })
                  .get('http://localhost:8000/')
+                 .url()
+                 .then(function(url){
+                    store.url = url;
+                 })
                  .break()
                  .elementByCss('#text')
                  .type('abcde')
@@ -159,9 +174,11 @@
                  .text()
                  .then(function(text){
                     // 'Input command or press enter to continue.'
-                    // {}
+                    // {url: 'http://localhost:8000/'}
                     // 'Input command or press enter to continue.'
-                    breakLogger.should.have.been.called.exactly(3);
+                    // http://localhost:8000/
+                    // 'Input command or press enter to continue.'
+                    breakLogger.should.have.been.called.exactly(5);
                     text.should.equal('abcde');
                     return b.quit();                    
                  })

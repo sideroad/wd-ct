@@ -5,7 +5,8 @@ module.exports = function (testcase, startColumn, callback){
       xlsx = require('node-xlsx'),
       XLS = require('xlsjs'),
       _ = require('lodash'),
-      suffix = testcase.match(/\.(.+)$/)[1],
+      path = require('path'),
+      suffix = path.extname(testcase),
       trimEmpty = function(err, header, body){
         var findLastIndex = function(line){
               return _.findLastIndex(line, function(val){
@@ -32,10 +33,10 @@ module.exports = function (testcase, startColumn, callback){
         callback(err, header, body);
       };
 
-  if(suffix === 'csv' || suffix === 'tsv'){
+  if(suffix === '.csv' || suffix === '.tsv'){
     csv
       .fromPath(testcase, {
-        delimiter: suffix === 'tsv' ? '\t' : ','
+        delimiter: suffix === '.tsv' ? '\t' : ','
       })
       .on("record", function(data, row){
 
@@ -50,7 +51,7 @@ module.exports = function (testcase, startColumn, callback){
       .on("end", function(){
         trimEmpty(null, header, body);
       });
-  } else if(suffix === 'xlsx') {
+  } else if(suffix === '.xlsx') {
     _.each(xlsx.parse(testcase).worksheets[0].data, function(data, row){
         // Header should be ignore
         if(row === 0){
@@ -65,7 +66,7 @@ module.exports = function (testcase, startColumn, callback){
         }));
     });
     trimEmpty(null, header, body);
-  } else if(suffix === 'xls') {
+  } else if(suffix === '.xls') {
     (function(){
       var workbook = XLS.readFile(testcase),
           worksheet = workbook.Sheets[ workbook.SheetNames[0] ],

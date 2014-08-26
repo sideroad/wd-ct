@@ -102,9 +102,12 @@ module.exports = function(options, callback){
               }
             }, function(err, results){
               loadTestcase(results.source, 0, function(err, header, body){
-                var asserts = _.map(body, function(line){
-                      return _.last(line);
-                    });
+                var asserts = _.chain(body)
+                               .map(function(line){
+                                 return _.last(line).split(/\r?\n\r?\n/);
+                               })
+                               .flatten()
+                               .value();
 
                 fs.writeFileSync( interaction, Mustache.render(template, {
                   inputs: header,
