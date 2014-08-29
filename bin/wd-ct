@@ -18,6 +18,11 @@ opts.parse([
     'value': true
   },
   {
+    'long': 'store',
+    'description': 'Prepare stored variable before execution (JSON format)',
+    'value': true
+  },
+  {
     'short': 'nl',
     'long': 'no-logging',
     'description': 'Not output logging',
@@ -34,7 +39,6 @@ opts.parse([
     'description': 'Not apply color to console',
   },
   {
-    'short': 's',
     'long': 'scaffold',
     'description': 'Generate interaction script and testcase file from template'
   },
@@ -74,7 +78,9 @@ opts.parse([
 
 if(opts.get('scaffold')){
   var WdCTScaffold = require('../src/wd-ct-scaffold');
-  new WdCTScaffold();
+  new WdCTScaffold({
+    testcase: opts.get('testcase')
+  });
 } else {
 
   options.testcase = opts.get('testcase');
@@ -135,6 +141,11 @@ if(opts.get('scaffold')){
   var force = opts.get('force');
   if(force){
     options.force = true;
+  }
+
+  var store = opts.get('store');
+  if(store){
+    options.store = JSON.parse(store);
   }
 
   var WdCT = require('../src/wd-ct');

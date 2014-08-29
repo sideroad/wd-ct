@@ -142,6 +142,28 @@
             });
         });
 
+        it('should scaffold only interaction script', function (done) {
+            var logger = chai.spy(function(){});
+
+            prompt.override = {
+                ok_to_create_interaction: 'y',
+                interaction: 'tmp/interaction.js'
+            };
+
+            new WdCTScaffold({
+                logger: logger,
+                testcase: 'template/testcase.csv'
+            }, function(){
+                logger.should.have.been.called.exactly(2);
+                fs.existsSync('tmp/testcase.csv').should.not.equal(true);
+                fs.existsSync('tmp/testcase.tsv').should.not.equal(true);
+                fs.existsSync('tmp/testcase.xls').should.not.equal(true);
+                fs.existsSync('tmp/testcase.xlsx').should.not.equal(true);
+                fs.existsSync('tmp/interaction.js').should.equal(true);
+                done();
+            });
+        });
+
         it('should not scaffold', function (done) {
             var logger = chai.spy(function(){});
 

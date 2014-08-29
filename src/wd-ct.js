@@ -20,7 +20,7 @@ var async = require('async'),
     loadTestcase = require('./load-testcase'),
     wdExtension = require('./wd-extension'),
     browser,
-    store = {};
+    store;
 
 var WdCT = function(options){
   var debug,
@@ -56,6 +56,7 @@ var WdCT = function(options){
     promptLogger: console.log
   }, options);
 
+  store = _.extend({}, options.store);
   testcase = options.testcase;
   interaction = options.interaction;
   stepwise = options.stepwise;

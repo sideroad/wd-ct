@@ -7,19 +7,28 @@ module.exports = function(options, callback){
       template = fs.readFileSync(__dirname+'/../template/interaction.tpl', 'utf-8'),
       loadTestcase = require('./load-testcase'),
       testcaseRegExp = /^.*\.(csv|tsv|xls|xlsx)$/,
-      logger;
+      logger,
+      testcase;
 
   options = _.extend({
     logger: console.log
   }, options);
 
+  testcase = options.testcase;
   logger = options.logger;
+
   prompt.message = '';
   prompt.delimiter = '';
   prompt.start();
 
   async.waterfall([
     function(callback){
+
+      if(testcase) {
+        callback();
+        return;
+      }
+
       logger('Are you sure you want to generate testcase? (y / n)');
       prompt.get({
         properties: {
@@ -87,13 +96,20 @@ module.exports = function(options, callback){
             }
           }, function(err, results){
             var interaction = results.interaction;
-            logger('Input source of testcase');
+            if(testcase) {
+              prompt.override = {
+                source: testcase
+              };
+            } else {
+              logger('Input source of testcase');
+            }
             prompt.get({
               properties: {
                 source: {
                   pattern: testcaseRegExp,
                   description: '>',
-                  default: 'testcase.csv',
+                  message: 'testcase file does not exists.',
+                  default: testcase || 'testcase.csv',
                   conform: function(source){
                     return fs.existsSync(source);
                   },
@@ -107,6 +123,7 @@ module.exports = function(options, callback){
                                  return _.last(line).split(/\r?\n\r?\n/);
                                })
                                .flatten()
+                               .uniq()
                                .value();
 
                 fs.writeFileSync( interaction, Mustache.render(template, {
