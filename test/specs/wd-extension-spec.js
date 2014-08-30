@@ -138,11 +138,20 @@
                 var called = 0,
                     breakLogger = chai.spy(function(){
                                       called++;
-                                      if(called === 3){
+
+                                      if(called === 1){
+                                        prompt.override = {
+                                            breakpoint: 'store'
+                                        };
+                                      } else if(called === 3){
                                         prompt.override = {
                                             breakpoint: 'store.url'
                                         };
-                                      } else if (called >= 5){
+                                      } else if(called === 5) {
+                                         prompt.override = {
+                                            breakpoint: 'hogehoge'
+                                        };
+                                      } else if(called ===7){
                                         prompt.override = {
                                             breakpoint: ' '
                                         };
@@ -151,10 +160,6 @@
                     wd = require('wd');
                     
                 wdExtension.adapt(wd, store, breakLogger);
-
-                prompt.override = {
-                    breakpoint: 'store'
-                };
 
                 var b = wd.promiseChainRemote();
                 b.init({
@@ -178,7 +183,9 @@
                     // 'Input command or press enter to continue.'
                     // http://localhost:8000/
                     // 'Input command or press enter to continue.'
-                    breakLogger.should.have.been.called.exactly(5);
+                    // Invalid input
+                    // 'Input command or press enter to continue.'
+                    breakLogger.should.have.been.called.exactly(7);
                     text.should.equal('abcde');
                     return b.quit();                    
                  })
