@@ -75,27 +75,63 @@
                     done(err);
                 });
             });
-            it('should ignore first column', function (done) {
+            it('should logging debug information', function (done) {
+                var debugLogger = chai.spy();
                 new WdCT({
                     interaction: 'test/fixture/interaction.js',
-                    testcase: 'test/fixture/testcase-with-numbering.csv',
+                    testcase: 'test/fixture/testcase.csv',
                     browsers: ['phantomjs'],
-                    startColumn: 1,
-                    debug: false
+                    debugLogger: debugLogger
                 }).done(function(){
+                    debugLogger.should.have.been.called.gt(1);
                     done();
                 }, function(err){
                     done(err);
                 });
             });
-            it('should fail and interrupted', function (done) {
-                var errorLogger = chai.spy(function(){});
+            it('should logging error information', function (done) {
+                var errorLogger = chai.spy();
                 new WdCT({
                     interaction: 'test/fixture/interaction-failed.js',
                     testcase: 'test/fixture/testcase.csv',
                     browsers: ['phantomjs'],
                     debug: false,
-                    errorLogger: errorLogger,
+                    errorLogger: errorLogger
+                }).done(function(){
+                    done('should failed');                    
+                }, function(){
+                    // error should be occurred once.
+                    errorLogger.should.have.been.called.once;
+
+                    done();
+                });
+            });
+
+            it('should ignore colored logging', function (done) {
+                var debugLogger = chai.spy(function(message){
+                                    message.should.have.equal(message.red);
+                                  });
+                new WdCT({
+                    interaction: 'test/fixture/interaction.js',
+                    testcase: 'test/fixture/testcase.csv',
+                    browsers: ['phantomjs'],
+                    debugLogger: debugLogger,
+                    color: false
+                }).done(function(){
+                    debugLogger.should.have.been.called.gt(1);
+                    done();                    
+                }, function(err){
+                    done(err);
+                });
+            });
+
+            it('should fail and interrupted', function (done) {
+                new WdCT({
+                    interaction: 'test/fixture/interaction-failed.js',
+                    testcase: 'test/fixture/testcase.csv',
+                    browsers: ['phantomjs'],
+                    debug: false,
+                    error :false,
                     errorScreenshot: 'tmp'
                 }).then(function(){
                     throw new Error('should fail');
@@ -107,35 +143,12 @@
                     err.should.have.property('row').and.equal(2);
                     err.should.have.property('command').and.equal('should submit text parameter as abcde');
 
-                    // error should be occurred once.
-                    errorLogger.should.have.been.called.once;
                 }).done(function(){
                     done();
                 }, function(err){
                     done(err);
                 });
                 
-            });
-            it('should continue test even through error occurred', function (done) {
-                var errorLogger = chai.spy(function(){});
-
-                new WdCT({
-                    interaction: 'test/fixture/interaction-failed.js',
-                    testcase: 'test/fixture/testcase.csv',
-                    browsers: ['phantomjs'],
-                    debug: false,
-                    errorLogger: errorLogger,
-                    force: true
-                }).then(function(){
-                    // error should be occurred twice.
-                    errorLogger.should.have.been.called.twice;
-                }, function(err){
-                    throw err;
-                }).done(function(){
-                    done();
-                }, function(err){
-                    done(err);
-                });
             });
             it('should throw error when command does not exists', function (done) {
                 new WdCT({
@@ -213,7 +226,63 @@
                 });
             });
         });
+        describe('execute with hooks', function () {
+            it('should execute with prepared store value', function (done) {
+                var promptLogger = chai.spy(function(){});
+
+                new WdCT({
+                    interaction: 'test/fixture/interaction-hooks.js',
+                    testcase: 'test/fixture/testcase.csv',
+                    browsers: ['phantomjs'],
+                    debug: false,
+                    promptLogger: promptLogger
+                }).done(function(){
+                    done();
+                }, function(err){
+                    done(err);
+                });
+            });
+        });
         describe('execute with options', function () {
+
+
+
+            it('should ignore first column', function (done) {
+                new WdCT({
+                    interaction: 'test/fixture/interaction.js',
+                    testcase: 'test/fixture/testcase-with-numbering.csv',
+                    browsers: ['phantomjs'],
+                    startColumn: 1,
+                    debug: false
+                }).done(function(){
+                    done();
+                }, function(err){
+                    done(err);
+                });
+            });
+
+            it('should continue test even through error occurred', function (done) {
+                var errorLogger = chai.spy(function(){});
+
+                new WdCT({
+                    interaction: 'test/fixture/interaction-failed.js',
+                    testcase: 'test/fixture/testcase.csv',
+                    browsers: ['phantomjs'],
+                    debug: false,
+                    errorLogger: errorLogger,
+                    force: true
+                }).then(function(){
+                    // error should be occurred twice.
+                    errorLogger.should.have.been.called.twice;
+                }, function(err){
+                    throw err;
+                }).done(function(){
+                    done();
+                }, function(err){
+                    done(err);
+                });
+            });
+
             it('should execute with prepared store value', function (done) {
                 var promptLogger = chai.spy(function(){});
 
