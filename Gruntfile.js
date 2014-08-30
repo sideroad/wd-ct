@@ -39,7 +39,7 @@ module.exports = function(grunt) {
   grunt.registerTask('test', ['clean', 'mochacov:test']);
   grunt.registerTask('coverage', ['mochacov:coverage']);
 
-  grunt.registerTask('ci', ['clean', 'mochacov:test', 'mochacov:coverage']);
+  grunt.registerTask('ci', ['clean', 'mochacov:coverage']);
   grunt.registerTask('default', ['clean', 'jshint', 'mochacov:test']);
 
 };
