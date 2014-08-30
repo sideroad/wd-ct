@@ -213,6 +213,26 @@
                 });
             });
         });
+        describe('execute with options', function () {
+            it('should execute with prepared store value', function (done) {
+                var promptLogger = chai.spy(function(){});
+
+                new WdCT({
+                    interaction: 'test/fixture/interaction-foo-bar.js',
+                    testcase: 'test/fixture/testcase.csv',
+                    browsers: ['phantomjs'],
+                    debug: false,
+                    store: {
+                        foo: 'bar'
+                    },
+                    promptLogger: promptLogger
+                }).done(function(){
+                    done();
+                }, function(err){
+                    done(err);
+                });
+            });
+        });
     });	
 
 
