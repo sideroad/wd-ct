@@ -53,6 +53,9 @@
                  .elementByCss('#logger')
                  .text()
                  .should.eventually.equal('abcde')
+                 .then(function(){
+                    return b.quit();
+                 })
                  .done(function(){
                     done();
                  }, function(err){

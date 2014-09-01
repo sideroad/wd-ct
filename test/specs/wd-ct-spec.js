@@ -244,9 +244,6 @@
             });
         });
         describe('execute with options', function () {
-
-
-
             it('should ignore first column', function (done) {
                 new WdCT({
                     interaction: 'test/fixture/interaction.js',

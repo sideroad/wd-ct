@@ -1,7 +1,6 @@
 'use strict';
 
 module.exports = function(grunt) {
-  var fs = require('fs');
 
   grunt.initConfig({
     clean: ['tmp/*'],
@@ -13,7 +12,6 @@ module.exports = function(grunt) {
     },
     mochacov: {
       options: {
-        require: [],
         timeout: "60000"
       },
       test: {
@@ -24,9 +22,7 @@ module.exports = function(grunt) {
       },
       coverage: {
         options: {
-        coveralls: {
-            repoToken: process.env.COVERALLS_REPO_TOKEN
-          }
+          coveralls: true
         },
         src: ['test/specs/*.js']
       }

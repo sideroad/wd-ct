@@ -1,6 +1,7 @@
 module.exports = function(options, callback){
   var prompt = require('prompt'),
       fs = require('fs'),
+      path = require('path'),
       async = require('async'),
       _ = require('lodash'),
       Mustache = require('mustache'),
@@ -52,15 +53,15 @@ module.exports = function(options, callback){
               }
             }
           }, function(err, results){
-            var ext = results.testcase.match(testcaseRegExp)[1];
+            var ext = path.extname(results.testcase);
 
-            if(ext === 'csv'){
+            if(ext === '.csv'){
               fs.createReadStream(__dirname+'/../template/testcase.csv').pipe(fs.createWriteStream(results.testcase));
-            } else if(ext === 'tsv'){
+            } else if(ext === '.tsv'){
               fs.createReadStream(__dirname+'/../template/testcase.tsv').pipe(fs.createWriteStream(results.testcase));
-            } else if(ext === 'xls'){
+            } else if(ext === '.xls'){
               fs.createReadStream(__dirname+'/../template/testcase.xls').pipe(fs.createWriteStream(results.testcase));
-            } else if(ext === 'xlsx'){
+            } else if(ext === '.xlsx'){
               fs.createReadStream(__dirname+'/../template/testcase.xlsx').pipe(fs.createWriteStream(results.testcase));
             }
 
