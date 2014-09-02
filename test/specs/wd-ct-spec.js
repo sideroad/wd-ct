@@ -76,7 +76,7 @@
                 });
             });
             it('should logging debug information', function (done) {
-                var debugLogger = chai.spy();
+                var debugLogger = chai.spy(function(){});
                 new WdCT({
                     interaction: 'test/fixture/interaction.js',
                     testcase: 'test/fixture/testcase.csv',
@@ -90,7 +90,7 @@
                 });
             });
             it('should logging error information', function (done) {
-                var errorLogger = chai.spy();
+                var errorLogger = chai.spy(function(){});
                 new WdCT({
                     interaction: 'test/fixture/interaction-failed.js',
                     testcase: 'test/fixture/testcase.csv',

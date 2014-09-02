@@ -52,7 +52,9 @@
                  .fire('change')
                  .elementByCss('#logger')
                  .text()
-                 .should.eventually.equal('abcde')
+                 .then(function(text){
+                    text.should.equal('abcde');
+                 })
                  .then(function(){
                     return b.quit();
                  })
@@ -82,12 +84,16 @@
                  .naturalType('abcde')
                  .elementByCss('#logger')
                  .text()
-                 .should.eventually.equal('abcde')
+                 .then(function(text){
+                    text.should.equal('abcde');
+                 })
                  .elementByCss('#text')
                  .naturalType('12345')
                  .elementByCss('#logger')
                  .text()
-                 .should.eventually.equal('12345')
+                 .then(function(text){
+                    text.should.equal('12345');
+                 })
                  .then(function(){
                     return b.quit();
                  })
@@ -107,6 +113,9 @@
                     wd = require('wd');
 
                 wdExtension.adapt(wd, store, breakLogger);
+                prompt.override = {
+                    breakpoint: ' '
+                };
 
                 var b = wd.promiseChainRemote();
                 b.init({
