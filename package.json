@@ -29,7 +29,8 @@
     "blanket": {
       "pattern": [
         "src"
-      ]
+      ],
+      "debug": true
     }
   },
   "bin": {

@@ -98,9 +98,9 @@ module.exports = function(options, callback){
           }, function(err, results){
             var interaction = results.interaction;
             if(testcase) {
-              prompt.override = {
+              prompt.override = _.extend({
                 source: testcase
-              };
+              }, prompt.override);
             } else {
               logger('Input source of testcase');
             }

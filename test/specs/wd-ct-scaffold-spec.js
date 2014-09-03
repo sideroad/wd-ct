@@ -13,13 +13,24 @@
     chai.should();
     describe('Scaffold', function () {
 
-        beforeEach(function(){            
+        beforeEach(function(done){            
             prompt.override = {};
-            fs.existsSync('tmp/testcase.csv')   && fs.unlinkSync('tmp/testcase.csv');
-            fs.existsSync('tmp/testcase.tsv')   && fs.unlinkSync('tmp/testcase.tsv');
-            fs.existsSync('tmp/testcase.xls')   && fs.unlinkSync('tmp/testcase.xls');
-            fs.existsSync('tmp/testcase.xlsx')  && fs.unlinkSync('tmp/testcase.xlsx');
-            fs.existsSync('tmp/interaction.js') && fs.unlinkSync('tmp/interaction.js');
+            if( fs.existsSync('tmp/testcase.csv') ){
+                fs.unlinkSync('tmp/testcase.csv');
+            }
+            if( fs.existsSync('tmp/testcase.tsv') ){
+                fs.unlinkSync('tmp/testcase.tsv');
+            }
+            if( fs.existsSync('tmp/testcase.xls') ) {
+                fs.unlinkSync('tmp/testcase.xls');
+            }
+            if( fs.existsSync('tmp/testcase.xlsx') ){
+                fs.unlinkSync('tmp/testcase.xlsx');
+            }
+            if(fs.existsSync('tmp/interaction.js') ){
+                fs.unlinkSync('tmp/interaction.js');
+            }
+            done();
         });
 
         it('should scaffold CSV testcase', function (done) {
