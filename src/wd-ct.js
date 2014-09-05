@@ -90,8 +90,10 @@ var WdCT = function(options){
     // Geld colors
     _.map( colors, function(val, key){
       if( typeof val === 'function' ){
-        String.prototype.__defineGetter__(key, function(){
-          return this;
+        Object.defineProperty( String.prototype, key, {
+          get: function(){
+            return this;
+          }
         });
       }
     });
