@@ -168,6 +168,11 @@ var WdCT = function(options){
                           throw err;
                         } else {
                           error(err);
+                          if(pauseOnError) {
+                            errorPromise = errorPromise.then(function(){
+                              browser.break();
+                            });                            
+                          }
                         }
                       },
                       defer = Q.defer(),
@@ -180,21 +185,11 @@ var WdCT = function(options){
                     err.val = err.val;
                   }
 
-                  if(pauseOnError) {
-                    errorPromise = errorPromise.then(function(){
-                      return browser.break();
-                    });
-                    if(!force){
-                      pauseOnError = false;
-                    }
-                  }
-
                   errorPromise = errorPromise.then(function(){
                     if(errorScreenshot) {
                       filename = path.join( errorScreenshot, + new Date().getTime()+'.png');
-                      return browser.takeScreenshot()
-                                    .then(function(screenshot){
-                                        fs.writeFileSync(filename, new Buffer( screenshot, 'base64').toString('binary'), 'binary');
+                      return browser.saveScreenshot(filename)
+                                    .then(function(){
                                         errorScreenshot = false;
                                         err.message += ' capture[ '+filename+' ]';
                                         throwError(err);
@@ -253,7 +248,7 @@ var WdCT = function(options){
           callback();
         }
       ], function(){
-        var teadown = function(err){
+        var teardown = function(err){
           debug(('Teardown browser ['+browserName+']').grey);
           return browser.quit().then(function(){
             callback(err);
@@ -261,10 +256,16 @@ var WdCT = function(options){
         };
 
         promise.then(function(){
-          teadown();
+          teardown();
         },function(err){
           error(err);
-          teadown( force ? undefined : err);
+          if(pauseOnError) {
+            browser.break().then(function(){
+              teardown( force ? undefined : err);
+            });
+          } else {
+            teardown( force ? undefined : err);
+          }
         }).done();
       });
     }, function(err){

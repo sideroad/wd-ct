@@ -31,6 +31,23 @@ module.exports = {
                    .fire('blur');
       }
     );
+
+    // patch for consecutive get process
+    var _get = wd.PromiseChainWebdriver.prototype.get;
+    wd.addPromiseChainMethod(
+      'get',
+      function(url) {
+        var token = 'wd_'+(+new Date())+'_'+(''+Math.random()).replace('.',''),
+            that = this;
+
+        return this.eval('window.'+token+'=true;')
+                   .then(function(){
+                     return _get.apply(that, [url]);
+                   })
+                   .waitForConditionInBrowser('!window.'+token, 10000, 1000);
+      }
+    );
+
     wd.addPromiseChainMethod(
       'break',
       function() {
