@@ -107,23 +107,23 @@
                 });
             });
 
-            it('should ignore colored logging', function (done) {
-                var debugLogger = chai.spy(function(message){
-                                    message.should.have.equal(message.red);
-                                  });
-                new WdCT({
-                    interaction: 'test/fixture/interaction.js',
-                    testcase: 'test/fixture/testcase.csv',
-                    browsers: ['phantomjs'],
-                    debugLogger: debugLogger,
-                    color: false
-                }).done(function(){
-                    debugLogger.should.have.been.called.gt(1);
-                    done();                    
-                }, function(err){
-                    done(err);
-                });
-            });
+            // it('should ignore colored logging', function (done) {
+            //     var debugLogger = chai.spy(function(message){
+            //                         message.should.have.equal(message.red);
+            //                       });
+            //     new WdCT({
+            //         interaction: 'test/fixture/interaction.js',
+            //         testcase: 'test/fixture/testcase.csv',
+            //         browsers: ['phantomjs'],
+            //         debugLogger: debugLogger,
+            //         color: false
+            //     }).done(function(){
+            //         debugLogger.should.have.been.called.gt(1);
+            //         done();                    
+            //     }, function(err){
+            //         done(err);
+            //     });
+            // });
 
             it('should fail and interrupted', function (done) {
                 new WdCT({
