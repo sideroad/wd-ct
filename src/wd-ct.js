@@ -11,7 +11,6 @@
 var async = require('async'),
     _ = require('lodash'),
     chai = require('chai'),
-    fs = require('fs'),
     chaiAsPromised = require('chai-as-promised'),
     Q = require('q'),
     wd = require('wd'),

@@ -4,7 +4,7 @@
 
 var spawn = require('simple-spawn').spawn,
     path = require('path'),
-    seleniumjar = __dirname+'/../vendor/selenium-server-standalone-2.42.2.jar',
+    seleniumjar = __dirname+'/../vendor/selenium-server-standalone-2.43.1.jar',
     defaultPort = 4444,
     getDriverOptions = function(port){
       var args = [],
@@ -14,7 +14,6 @@ var spawn = require('simple-spawn').spawn,
       args.push( process.platform !== 'win32' ? '' : 
                     process.config.variables.host_arch === 'x64' ? '-Dwebdriver.ie.driver='+ base + path.sep + 'IEDriverServer.x64.exe' :
                                                                    '-Dwebdriver.ie.driver='+ base + path.sep + 'IEDriverServer.x86.exe' );
-
       //weddriver.chrome.driver
       args.push( process.platform === 'darwin' ? '-Dwebdriver.chrome.driver='+ base + path.sep + 'mac.chromedriver' :
                     process.platform === 'win32'  ? '-Dwebdriver.chrome.driver='+ base + path.sep + 'chromedriver.exe' :
@@ -35,21 +34,15 @@ module.exports = function(){
         child.stderr.on('data', function(data){
           data = typeof data === "string" ? data : ''+data;
           server.emit('data', data.replace(/\n$/, ''));
+          if(data.match('Started org.openqa.jetty.jetty.Server')) {
+            server.emit('start');
+          }
           if(data.match('Selenium is already running on port')) {
             child.kill();
             server.port++;
             server.emit('data', '      reallocating port with '+server.port);
             child = spawn('java -jar ' + seleniumjar + getDriverOptions(server.port));
             addEvent(child);
-          }
-        });
-
-        child.stdout.on('data', function(data){
-          data = typeof data === "string" ? data : ''+data;
-          server.emit('data', data.replace(/\n$/,''));
-
-          if(data.match('Started org.openqa.jetty.jetty.Server')) {
-            server.emit('start');
           }
         });
 
