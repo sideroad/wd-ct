@@ -32,6 +32,7 @@
                     interaction: 'test/fixture/interaction.js',
                     testcase: 'test/fixture/testcase.csv',
                     browsers: ['phantomjs'],
+                    info: false,
                     debug: false
                 }).done(function(){
                     done();
@@ -44,6 +45,7 @@
                     interaction: 'test/fixture/interaction.js',
                     testcase: 'test/fixture/testcase.tsv',
                     browsers: ['phantomjs'],
+                    info: false,
                     debug: false
                 }).done(function(){
                     done();
@@ -56,6 +58,7 @@
                     interaction: 'test/fixture/interaction.js',
                     testcase: 'test/fixture/testcase.xlsx',
                     browsers: ['phantomjs'],
+                    info: false,
                     debug: false
                 }).done(function(){
                     done();
@@ -68,8 +71,24 @@
                     interaction: 'test/fixture/interaction.js',
                     testcase: 'test/fixture/testcase.xls',
                     browsers: ['phantomjs'],
+                    info: false,
                     debug: false
                 }).done(function(){
+                    done();
+                }, function(err){
+                    done(err);
+                });
+            });
+            it('should logging info information', function (done) {
+                var infoLogger = chai.spy(function(){});
+                new WdCT({
+                    interaction: 'test/fixture/interaction.js',
+                    testcase: 'test/fixture/testcase.csv',
+                    browsers: ['phantomjs'],
+                    infoLogger: infoLogger,
+                    debug: false
+                }).done(function(){
+                    infoLogger.should.have.been.called.gt(1);
                     done();
                 }, function(err){
                     done(err);
@@ -81,6 +100,7 @@
                     interaction: 'test/fixture/interaction.js',
                     testcase: 'test/fixture/testcase.csv',
                     browsers: ['phantomjs'],
+                    info: false,
                     debugLogger: debugLogger
                 }).done(function(){
                     debugLogger.should.have.been.called.gt(1);
@@ -95,6 +115,7 @@
                     interaction: 'test/fixture/interaction-failed.js',
                     testcase: 'test/fixture/testcase.csv',
                     browsers: ['phantomjs'],
+                    info: false,
                     debug: false,
                     errorLogger: errorLogger
                 }).done(function(){
@@ -130,6 +151,7 @@
                     interaction: 'test/fixture/interaction-failed.js',
                     testcase: 'test/fixture/testcase.csv',
                     browsers: ['phantomjs'],
+                    info: false,
                     debug: false,
                     error :false,
                     errorScreenshot: 'tmp'
@@ -155,6 +177,7 @@
                     interaction: 'test/fixture/interaction-not-enough.js',
                     testcase: 'test/fixture/testcase.xlsx',
                     browsers: ['phantomjs'],
+                    info: false,
                     debug: false,
                     error: false
                 }).then(function(){
@@ -178,6 +201,7 @@
                     interaction: 'test/fixture/interaction.js',
                     testcase: 'test/fixture/testcase.csv',
                     browsers: ['phantomjs'],
+                    info: false,
                     debug: false,
                     stepwise: true,
                     promptLogger: promptLogger
@@ -200,6 +224,7 @@
                     interaction: 'test/fixture/interaction-failed.js',
                     testcase: 'test/fixture/testcase.csv',
                     browsers: ['phantomjs'],
+                    info: false,
                     debug: false,
                     pauseOnError: true,
                     promptLogger: promptLogger,
@@ -234,6 +259,7 @@
                     interaction: 'test/fixture/interaction-hooks.js',
                     testcase: 'test/fixture/testcase.csv',
                     browsers: ['phantomjs'],
+                    info: false,
                     debug: false,
                     promptLogger: promptLogger
                 }).done(function(){
@@ -250,8 +276,27 @@
                     testcase: 'test/fixture/testcase-with-numbering.csv',
                     browsers: ['phantomjs'],
                     startColumn: 1,
+                    info: false,
                     debug: false
                 }).done(function(){
+                    done();
+                }, function(err){
+                    done(err);
+                });
+            });
+
+            it('should execute only specified row number test', function (done) {
+                var infoLogger = chai.spy();
+                new WdCT({
+                    interaction: 'test/fixture/interaction.js',
+                    testcase: 'test/fixture/testcase.csv',
+                    browsers: ['phantomjs'],
+                    rowNum: 2,
+                    infoLogger: infoLogger,
+                    debug: false
+                }).done(function(){
+                    infoLogger.should.have.been.called.exactly(4);
+                    // infoLogger.should.have.been.called.with('should submit text parameter as abcde val[]');
                     done();
                 }, function(err){
                     done(err);
@@ -265,6 +310,7 @@
                     interaction: 'test/fixture/interaction-failed.js',
                     testcase: 'test/fixture/testcase.csv',
                     browsers: ['phantomjs'],
+                    info: false,
                     debug: false,
                     errorLogger: errorLogger,
                     force: true
@@ -287,6 +333,7 @@
                     interaction: 'test/fixture/interaction-foo-bar.js',
                     testcase: 'test/fixture/testcase.csv',
                     browsers: ['phantomjs'],
+                    info: false,
                     debug: false,
                     store: {
                         foo: 'bar'

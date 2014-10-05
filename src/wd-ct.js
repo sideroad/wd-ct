@@ -22,7 +22,8 @@ var async = require('async'),
     store;
 
 var WdCT = function(options){
-  var debug,
+  var info,
+      debug,
       error,
       testcase,
       server,
@@ -32,9 +33,11 @@ var WdCT = function(options){
       errorScreenshot,
       pauseOnError,
       force,
+      infoLogger,
       debugLogger,
       errorLogger,
       promptLogger,
+      rowNum,
       wdCtDefer = Q.defer();
 
   options = _.extend({
@@ -42,6 +45,7 @@ var WdCT = function(options){
     testcase: 'testcase.csv',
     interaction: 'interaction.csv',
     color: true,
+    info: true,
     debug: true,
     error: true,
     proxy: undefined,
@@ -50,9 +54,11 @@ var WdCT = function(options){
     pauseOnError: false,
     force: false,
     startColumn: 0,
+    infoLogger: console.log,
     debugLogger: console.log,
     errorLogger: console.log,
-    promptLogger: console.log
+    promptLogger: console.log,
+    rowNum: undefined
   }, options);
 
   store = _.extend({}, options.store);
@@ -63,9 +69,14 @@ var WdCT = function(options){
   errorScreenshot = options.errorScreenshot;
   pauseOnError = options.pauseOnError;
   force = options.force;
+  infoLogger = options.infoLogger;
   debugLogger = options.debugLogger;
   errorLogger = options.errorLogger;
   promptLogger = options.promptLogger;
+  rowNum = options.rowNum;
+  info = options.info ? function(mes){
+    infoLogger(mes.blue);
+  } : function(){};
   debug = options.debug ? function(){
     debugLogger.apply(debugLogger, arguments);
   } : function(){};
@@ -145,6 +156,7 @@ var WdCT = function(options){
         },
         function execute(header, body, callback){
           var queue = function(command, fn, val, col, row){
+                info(command + ' val['+val+']');
                 if(!fn){
                   promise = promise.then(function(){
                     var err = new Error();
@@ -212,6 +224,10 @@ var WdCT = function(options){
 
           if(commands.before) {
             queue('before', commands.before, '', null, null);
+          }
+
+          if(rowNum) {
+            body = body.slice(rowNum-2, rowNum-1);
           }
 
           _.each(body, function(data, row){

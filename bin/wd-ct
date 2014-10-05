@@ -59,6 +59,11 @@ opts.parse([
     'value': true
   },
   {
+    'short': 'rn',
+    'long': 'rownum',
+    'description': 'Execute only specified row number test'
+  },
+  {
     'short': 'es',
     'long': 'error-screenshot',
     'description': 'Capture page when error occurred. please set captured image directory path',
@@ -146,6 +151,11 @@ if(opts.get('scaffold')){
   var store = opts.get('store');
   if(store){
     options.store = JSON.parse(store);
+  }
+
+  var rowNum = opts.get('rowNum');
+  if(rowNum) {
+    options.rowNum = Number(rowNum);
   }
 
   var WdCT = require('../src/wd-ct');
