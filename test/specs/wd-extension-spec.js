@@ -105,6 +105,46 @@
             });
         });
 
+        describe('select', function () {
+            var store = {},
+                wd = require('wd');
+
+            wdExtension.adapt(wd, store, function(){});
+
+            it('should select option', function (done) {
+                var b = wd.promiseChainRemote();
+
+                b.init({
+                    browserName: 'phantomjs',
+                    port: server.port
+                 })
+                 .get('http://localhost:8000/')
+                 .elementByCss('#selectbox')
+                 .select('b')
+                 .elementByCss('#logger')
+                 .text()
+                 .then(function(text){
+                    text.should.equal('2');
+                 })
+                 .elementByCss('#selectbox')
+                 .select('c')
+                 .elementByCss('#logger')
+                 .text()
+                 .then(function(text){
+                    text.should.equal('3');
+                 })
+                 .then(function(){
+                    return b.quit();
+                 })
+                 .done(function(){
+                    done();
+                 }, function(err){
+                    done(err);
+                 });
+            });
+        });
+
+
         describe('break', function () {
             var store = {};
 

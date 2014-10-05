@@ -4,6 +4,9 @@
 		$('#text').change(function(){
 			$('#logger').text(this.value);
 		});
+		$('#selectbox').change(function(){
+			$('#logger').text($(this).val());
+		});
 
 		$('#button').change(function(){
 			$('#logger').text('clicked button');

@@ -4,7 +4,8 @@ module.exports = {
         path = require('path'),
         Q = require('q'),
         prompt = require('prompt'),
-        fire = fs.readFileSync( path.join( __dirname, '/fire.js'), 'utf8').toString();
+        fire = fs.readFileSync( path.join( __dirname, 'browser/fire.js'), 'utf8').toString(),
+        select = fs.readFileSync( path.join( __dirname, 'browser/select.js'), 'utf8').toString();
 
     prompt.message = '';
     prompt.delimiter = '';
@@ -20,13 +21,27 @@ module.exports = {
                    });
       }
     );
-      // adding custom promise chain method
+    // adding custom promise chain method
     wd.addElementPromiseChainMethod(
       'naturalType',
       function(val) {
         return this.fire('focus')
                    .clear()
                    .type(val)
+                   .fire('change')
+                   .fire('blur');
+      }
+    );
+    // adding custom promise chain method
+    wd.addElementPromiseChainMethod(
+      'select',
+      function(text) {
+        var that = this;
+        return this.fire('focus')
+                   .execute(select, [{ELEMENT: this.value}, text])
+                   .then(function(){
+                    return that;
+                   })
                    .fire('change')
                    .fire('blur');
       }
