@@ -44,24 +44,29 @@ Continue to execute test even though error occurred
     -f, --force
 Capture page when error occurred. please set captured image directory path
     -es, --error-screenshot <value>
-Input command start column index number should be set
+Execute only specified row number test
+    -rn, --rownum
+Interation start column index number should be set
     -sc, --start-column <value>
 Pause on error
     -pe, --pause-on-error
 Stepwise execution
     -sw, --stepwise
-Generate sample script and csv from template
-    -s, --scaffold
+Generate interaction script and testcase file from template
+    --scaffold
 Not apply color to console
     -nc, --no-color
 Browser ( comma separatted )
     -b, --browsers <value>
 Not output logging
     -nl, --no-logging
+Prepare stored variable before execution (JSON format)
+    --store <value>
 Target interaction file
     -i, --interaction <value>
 Target testcase file
     -t, --testcase <value>
+
 ```
 
 Concreate interaction script and testcase file.
@@ -173,3 +178,9 @@ return this.elementByCss('input[type="text"]')
            .fire('blur')
 ```
 
+#### select
+select option of selectbox
+```js
+return this.elementByCss('#selectbox')
+           .select('banana')
+```

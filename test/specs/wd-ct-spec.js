@@ -24,7 +24,7 @@
             done();
         });
 
-	    var WdCT = require('../../src/wd-ct');
+        var WdCT = require('../../src/wd-ct');
 
         describe('execute test', function () {
             it('should succeed CSV test', function (done) {
@@ -346,7 +346,7 @@
                 });
             });
         });
-    });	
+    }); 
 
 
 })();
