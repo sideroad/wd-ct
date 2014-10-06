@@ -64,6 +64,13 @@ module.exports = {
     );
 
     wd.addPromiseChainMethod(
+      'waitForNoElement',
+      function(selector){
+        this.waitForConditionInBrowser('!document.querySelectorAll('+selector+').length ? true : false', 10000, 1000);
+      }
+    );
+
+    wd.addPromiseChainMethod(
       'break',
       function() {
         var that = this,
