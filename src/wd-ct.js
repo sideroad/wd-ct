@@ -156,7 +156,7 @@ var WdCT = function(options){
         },
         function execute(header, body, callback){
           var queue = function(command, fn, val, col, row){
-                info(command + ' val['+val+']');
+                
                 if(!fn){
                   promise = promise.then(function(){
                     var err = new Error();
@@ -169,6 +169,7 @@ var WdCT = function(options){
                 }
 
                 promise = promise.then(function(){
+                  info(command + ' val['+val+']');
                   return fn.apply( browser, [val, store]);                  
                 });
 
