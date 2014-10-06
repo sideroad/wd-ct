@@ -25,9 +25,14 @@ module.exports = {
     wd.addElementPromiseChainMethod(
       'naturalType',
       function(val) {
-        return this.fire('focus')
-                   .clear()
-                   .type(val)
+        var that = this;
+        
+        return this.fire('click')
+                   .fire('focus')
+                   .execute('arguments[0].value=arguments[1]', [{ELEMENT: this.value}, val])
+                   .then(function(){
+                    return that;
+                   })
                    .fire('change')
                    .fire('blur');
       }
