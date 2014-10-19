@@ -1,0 +1,4 @@
+open,click first link,assert,
+http://sideroad.secret.jp/,,should have title "Setup Grunt on Jenkins",
+http://sideroad.secret.jp/plugins/,,should have title "jQuery Text Animation - jQuery Plugins",
+,,,,

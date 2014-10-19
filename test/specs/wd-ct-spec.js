@@ -11,6 +11,7 @@
     chai.use(spies);
     chai.should();
 
+
     describe('WbCT', function () {
 
         before(function(done){
@@ -25,6 +26,23 @@
         });
 
         var WdCT = require('../../src/wd-ct');
+
+        describe('execute saucelabs testcase', function () {
+            it('should succeed CSV test', function (done) {
+                new WdCT({
+                    interaction: 'test/fixture/interaction-saucelabs.js',
+                    testcase: 'test/fixture/testcase-saucelabs.csv',
+                    browsers: ['chrome'],
+                    saucelabs: true,
+                    info: false,
+                    debug: false
+                }).done(function(){
+                    done();
+                }, function(err){
+                    done(err);
+                });
+            });
+        });
 
         describe('execute test', function () {
             it('should succeed CSV test', function (done) {
@@ -346,6 +364,7 @@
                 });
             });
         });
+
     }); 
 
 

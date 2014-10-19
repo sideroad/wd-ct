@@ -14,6 +14,7 @@ var async = require('async'),
     chaiAsPromised = require('chai-as-promised'),
     Q = require('q'),
     wd = require('wd'),
+    url = require('url'),
     path = require('path'),
     SeleniumServer = require('./setup-server'),
     loadTestcase = require('./load-testcase'),
@@ -38,6 +39,8 @@ var WdCT = function(options){
       errorLogger,
       promptLogger,
       rowNum,
+      saucelabs,
+      remote,
       wdCtDefer = Q.defer();
 
   options = _.extend({
@@ -58,7 +61,8 @@ var WdCT = function(options){
     debugLogger: console.log,
     errorLogger: console.log,
     promptLogger: console.log,
-    rowNum: undefined
+    rowNum: undefined,
+    saucelabs: undefined
   }, options);
 
   store = _.extend({}, options.store);
@@ -74,6 +78,13 @@ var WdCT = function(options){
   errorLogger = options.errorLogger;
   promptLogger = options.promptLogger;
   rowNum = options.rowNum;
+  saucelabs = options.saucelabs;
+  remote = saucelabs ? [
+    "ondemand.saucelabs.com",
+    80,
+    saucelabs === true ? process.env.SAUCE_USERNAME   : saucelabs.username,
+    saucelabs === true ? process.env.SAUCE_ACCESS_KEY : saucelabs.accesskey
+  ] : undefined;
   info = options.info ? function(mes){
     infoLogger(mes.blue);
   } : function(){};
@@ -127,7 +138,7 @@ var WdCT = function(options){
       chai.should();
       chaiAsPromised.transferPromiseness = wd.transferPromiseness;
 
-      browser = wd.promiseChainRemote();
+      browser = wd.promiseChainRemote.apply( wd, remote? remote : []);
       // optional extra logging
       browser.on('status', function(info) {
         debug(info.cyan);
@@ -139,13 +150,16 @@ var WdCT = function(options){
         debug(' > ', path.yellow, (data || '').magenta);
       });
 
-      promise = browser.init({
-        browserName: browserName,
-        name: 'This is an example test',
-        hostname: '127.0.0.1',
-        port: server.port,
-        proxy: options.proxy
-      });
+      promise = browser.init(_.extend({
+                  hostname: '127.0.0.1',
+                  browserName: browserName
+                },
+                !remote ? {
+                  port: server.port,
+                  proxy: options.proxy
+                } :{
+                  port: 80
+                }));
 
       debug(('  Running testcase['+testcase+']').grey);
 
