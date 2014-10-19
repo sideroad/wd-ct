@@ -61,7 +61,13 @@ opts.parse([
   {
     'short': 'rn',
     'long': 'rownum',
-    'description': 'Execute only specified row number test'
+    'description': 'Execute only specified row number test',
+    'value': true
+  },
+  {
+    'short': 'sl',
+    'long': 'saucelabs',
+    'description': 'Use saucelabs ( Please set SAUCE_USERNAME, SAUCE_ACCESS_KEY environment before execute )'
   },
   {
     'short': 'es',
@@ -153,9 +159,14 @@ if(opts.get('scaffold')){
     options.store = JSON.parse(store);
   }
 
-  var rowNum = opts.get('rowNum');
+  var rowNum = opts.get('rownum');
   if(rowNum) {
     options.rowNum = Number(rowNum);
+  }
+
+  var saucelabs = opts.get('saucelabs');
+  if(saucelabs) {
+    options.saucelabs = true;
   }
 
   var WdCT = require('../src/wd-ct');

@@ -44,8 +44,10 @@ Continue to execute test even though error occurred
     -f, --force
 Capture page when error occurred. please set captured image directory path
     -es, --error-screenshot <value>
+Use saucelabs ( Please set SAUCE_USERNAME, SAUCE_ACCESS_KEY environment before execute )
+    -sl, --saucelabs
 Execute only specified row number test
-    -rn, --rownum
+    -rn, --rownum <value>
 Interation start column index number should be set
     -sc, --start-column <value>
 Pause on error
@@ -66,7 +68,6 @@ Target interaction file
     -i, --interaction <value>
 Target testcase file
     -t, --testcase <value>
-
 ```
 
 Concreate interaction script and testcase file.
