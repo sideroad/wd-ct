@@ -12,7 +12,7 @@ module.exports = function(grunt) {
     },
     mochacov: {
       options: {
-        timeout: "60000"
+        timeout: "240000"
       },
       test: {
         options: {

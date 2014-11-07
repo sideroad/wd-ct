@@ -14,7 +14,6 @@ var async = require('async'),
     chaiAsPromised = require('chai-as-promised'),
     Q = require('q'),
     wd = require('wd'),
-    url = require('url'),
     path = require('path'),
     SeleniumServer = require('./setup-server'),
     loadTestcase = require('./load-testcase'),
@@ -46,7 +45,7 @@ var WdCT = function(options){
   options = _.extend({
     browsers: ['firefox'],
     testcase: 'testcase.csv',
-    interaction: 'interaction.csv',
+    interaction: 'interaction.js',
     color: true,
     info: true,
     debug: true,
@@ -131,8 +130,12 @@ var WdCT = function(options){
 
     async.mapSeries( options.browsers, function(browserName, callback){
       var promise,
-          commands;
+          commands,
+          capabilities = typeof browserName === 'string' ? {
+            browserName: browserName
+          } : browserName;
 
+      browserName = capabilities.browserName;
       debug(('Setup browser ['+browserName+']').grey);
       chai.use(chaiAsPromised);
       chai.should();
@@ -150,15 +153,22 @@ var WdCT = function(options){
         debug(' > ', path.yellow, (data || '').magenta);
       });
 
-      promise = browser.init(_.extend({
+      promise = browser.init(_.extend(
+                // Default settings
+                {
                   hostname: '127.0.0.1',
-                  browserName: browserName
+                  name: testcase
                 },
-                !remote ? {
+
+                // Browser settings
+                capabilities,
+
+                // Saucelabs settings
+                remote ? {
+                  port: 80
+                } : {
                   port: server.port,
                   proxy: options.proxy
-                } :{
-                  port: 80
                 }));
 
       debug(('  Running testcase['+testcase+']').grey);
