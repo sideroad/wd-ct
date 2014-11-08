@@ -4,7 +4,7 @@
 
 var spawn = require('simple-spawn').spawn,
     path = require('path'),
-    seleniumjar = __dirname+'/../vendor/selenium-server-standalone-2.43.1.jar',
+    seleniumjar = __dirname+'/../vendor/selenium-server-standalone-2.44.0.jar',
     defaultPort = 4444,
     getDriverOptions = function(port){
       var args = [],
