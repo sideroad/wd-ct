@@ -44,6 +44,7 @@
                             platform: 'Windows 7'
                         }
                     ],
+                    parallel: true,
                     saucelabs: true,
                     info: false,
                     debug: false

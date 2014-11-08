@@ -146,11 +146,11 @@
 
 
         describe('break', function () {
-            var store = {};
 
             it('should pause execution', function (done) {
                 var breakLogger = chai.spy(function(){}),
-                    wd = require('wd');
+                    wd = require('wd'),
+                    store = {};
 
                 wdExtension.adapt(wd, store, breakLogger);
                 prompt.override = {
@@ -166,6 +166,7 @@
                  .url()
                  .then(function(url){
                     store.url = url;
+                    store.a = 1;
                  })
                  .break()
                  .elementByCss('#text')
@@ -177,6 +178,7 @@
                     text.should.equal('abcde');
                     // 'Input command or press enter to continue.'
                     breakLogger.should.have.been.called.once;
+                    store.a.should.equal(1);
                     return b.quit();                    
                  })
                  .done(function(){
@@ -209,7 +211,8 @@
                                         };
                                       }
                                   }),
-                    wd = require('wd');
+                    wd = require('wd'),
+                    store = {};
                     
                 wdExtension.adapt(wd, store, breakLogger);
 
@@ -222,6 +225,7 @@
                  .url()
                  .then(function(url){
                     store.url = url;
+                    store.b = 2;
                  })
                  .break()
                  .elementByCss('#text')
@@ -239,6 +243,8 @@
                     // 'Input command or press enter to continue.'
                     breakLogger.should.have.been.called.exactly(7);
                     text.should.equal('abcde');
+                    store.should.not.have.property('a');
+                    store.b.should.equal(2);
                     return b.quit();                    
                  })
                  .done(function(){

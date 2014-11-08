@@ -13,13 +13,10 @@ var async = require('async'),
     chai = require('chai'),
     chaiAsPromised = require('chai-as-promised'),
     Q = require('q'),
-    wd = require('wd'),
     path = require('path'),
     SeleniumServer = require('./setup-server'),
     loadTestcase = require('./load-testcase'),
-    wdExtension = require('./wd-extension'),
-    browser,
-    store;
+    wdExtension = require('./wd-extension');
 
 var WdCT = function(options){
   var info,
@@ -40,7 +37,9 @@ var WdCT = function(options){
       rowNum,
       saucelabs,
       remote,
-      wdCtDefer = Q.defer();
+      parallel,
+      wdCtDefer = Q.defer(),
+      _store;
 
   options = _.extend({
     browsers: ['firefox'],
@@ -60,11 +59,12 @@ var WdCT = function(options){
     debugLogger: console.log,
     errorLogger: console.log,
     promptLogger: console.log,
+    parallel: false,
     rowNum: undefined,
     saucelabs: undefined
   }, options);
 
-  store = _.extend({}, options.store);
+  _store = _.extend({}, options.store);
   testcase = options.testcase;
   interaction = options.interaction;
   stepwise = options.stepwise;
@@ -78,6 +78,7 @@ var WdCT = function(options){
   promptLogger = options.promptLogger;
   rowNum = options.rowNum;
   saucelabs = options.saucelabs;
+  parallel = options.parallel;
   remote = saucelabs ? [
     "ondemand.saucelabs.com",
     80,
@@ -100,9 +101,6 @@ var WdCT = function(options){
     errorLogger.apply(errorLogger, [mes.red]);
   } : function(){};
 
-  // Apply wd-extension
-  wdExtension.adapt(wd, store, promptLogger);
-
   // Apply colors to console.log
   var colors = require('colors');
   if(!options.color){
@@ -119,21 +117,20 @@ var WdCT = function(options){
     });
   }
 
-  debug('Setup Selenium Server...'.grey);
+  var executeWd = function(){
 
-  server = new SeleniumServer();
-  server.on('data', function(data){
-    debug(data.grey);
-  });
-
-  server.on('start', function(){
-
-    async.mapSeries( options.browsers, function(browserName, callback){
+    (parallel ? async.each : async.mapSeries).call( async, options.browsers, function(browserName, callback){
       var promise,
           commands,
+          browser,
+          wd = require('wd'),
+          store = _.extend({}, _store),
           capabilities = typeof browserName === 'string' ? {
             browserName: browserName
           } : browserName;
+
+      // Apply wd-extension
+      wdExtension.adapt(wd, store, promptLogger);
 
       browserName = capabilities.browserName;
       debug(('Setup browser ['+browserName+']').grey);
@@ -309,14 +306,31 @@ var WdCT = function(options){
         }).done();
       });
     }, function(err){
-      server.kill();
+      if(server) {
+        server.kill();
+      }
       if(err){
         wdCtDefer.reject(err);
       } else {
         wdCtDefer.resolve();
       }
     });
-  });
+  };
+
+  // Set up selenium server on local
+  if(!remote) {
+    debug('Setup Selenium Server...'.grey);
+
+    server = new SeleniumServer();
+    server.on('data', function(data){
+      debug(data.grey);
+    });
+
+    server.on('start', executeWd);
+  } else {
+    executeWd();
+  }
+
   return wdCtDefer.promise;
 };
 

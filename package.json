@@ -1,7 +1,7 @@
 {
   "name": "wd-ct",
   "description": "Run WebDriver for combinatorial testing",
-  "version": "2.2.0",
+  "version": "3.0.0",
   "homepage": "https://github.com/sideroad/wd-ct",
   "author": {
     "name": "sideroad",
