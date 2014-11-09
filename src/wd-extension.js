@@ -1,6 +1,7 @@
 module.exports = {
   adapt: function(wd, store, logger){
     var fs = require('fs'),
+        _ = require('lodash'),
         path = require('path'),
         Q = require('q'),
         prompt = require('prompt'),
@@ -69,9 +70,26 @@ module.exports = {
     );
 
     wd.addPromiseChainMethod(
+      'getBrowserErrors',
+      function() {
+
+        return this.log('browser')
+                   .then(function(logs){
+
+                     return _.chain(logs)
+                             .where({
+                               level: 'SEVERE'
+                             })
+                             .pluck('message')
+                             .value();
+                   });
+      }
+    );
+
+    wd.addPromiseChainMethod(
       'waitForNoElement',
       function(selector){
-        this.waitForConditionInBrowser('!document.querySelectorAll('+selector+').length ? true : false', 10000, 1000);
+        return this.waitForConditionInBrowser('!document.querySelectorAll('+selector+').length ? true : false', 10000, 1000);
       }
     );
 

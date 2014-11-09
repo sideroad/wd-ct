@@ -38,6 +38,7 @@ var WdCT = function(options){
       saucelabs,
       remote,
       parallel,
+      validBrowserError,
       wdCtDefer = Q.defer(),
       _store;
 
@@ -61,7 +62,8 @@ var WdCT = function(options){
     promptLogger: console.log,
     parallel: false,
     rowNum: undefined,
-    saucelabs: undefined
+    saucelabs: undefined,
+    validBrowserError: false
   }, options);
 
   _store = _.extend({}, options.store);
@@ -100,6 +102,7 @@ var WdCT = function(options){
 
     errorLogger.apply(errorLogger, [mes.red]);
   } : function(){};
+  validBrowserError = options.validBrowserError;
 
   // Apply colors to console.log
   var colors = require('colors');
@@ -191,7 +194,18 @@ var WdCT = function(options){
 
                 promise = promise.then(function(){
                   info(command + ' val['+val+']');
-                  return fn.apply( browser, [val, store]);                  
+                  var dfd = fn.apply( browser, [val, store]);
+                  if(validBrowserError) {
+                    dfd = dfd.then(function(){
+                      return browser.getBrowserErrors().then(function(errs){
+                        if(errs.length){
+                          throw new Error(errs);
+                        }
+                        return this;
+                      });
+                    });
+                  }
+                  return dfd;
                 });
 
                 promise = promise.fail(function(err){

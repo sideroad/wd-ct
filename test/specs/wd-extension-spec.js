@@ -34,6 +34,37 @@
         });
 
 
+        describe('getBrowserErrors', function () {
+            var store = {},
+                wd = require('wd');
+
+            wdExtension.adapt(wd, store, function(){});
+
+            it('should get browser error', function (done) {
+                var b = wd.promiseChainRemote();
+                b.init({
+                    browserName: 'chrome',
+                    port: server.port
+                 })
+                 .get('http://localhost:8000/')
+                 .getBrowserErrors()
+                 .then(function(errs){
+                    errs.should.have.length(0);
+                 })
+                 .elementByCss('#throw-error')
+                 .click()
+                 .getBrowserErrors()
+                 .then(function(errs){
+                    errs.should.have.length(1);
+                 })
+                 .done(function(){
+                    done();
+                 }, function(err){
+                    done(err);
+                 });
+            });
+        });
+
         describe('fire', function () {
             var store = {},
                 wd = require('wd');
@@ -43,7 +74,7 @@
             it('should fire events', function (done) {
                 var b = wd.promiseChainRemote();
                 b.init({
-                    browserName: 'phantomjs',
+                    browserName: 'chrome',
                     port: server.port
                  })
                  .get('http://localhost:8000/')
@@ -76,7 +107,7 @@
                 var b = wd.promiseChainRemote();
 
                 b.init({
-                    browserName: 'phantomjs',
+                    browserName: 'chrome',
                     port: server.port
                  })
                  .get('http://localhost:8000/')
@@ -115,7 +146,7 @@
                 var b = wd.promiseChainRemote();
 
                 b.init({
-                    browserName: 'phantomjs',
+                    browserName: 'chrome',
                     port: server.port
                  })
                  .get('http://localhost:8000/')
@@ -159,7 +190,7 @@
 
                 var b = wd.promiseChainRemote();
                 b.init({
-                    browserName: 'phantomjs',
+                    browserName: 'chrome',
                     port: server.port
                  })
                  .get('http://localhost:8000/')
@@ -218,7 +249,7 @@
 
                 var b = wd.promiseChainRemote();
                 b.init({
-                    browserName: 'phantomjs',
+                    browserName: 'chrome',
                     port: server.port
                  })
                  .get('http://localhost:8000/')

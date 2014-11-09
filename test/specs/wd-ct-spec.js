@@ -61,7 +61,7 @@
                 new WdCT({
                     interaction: 'test/fixture/interaction.js',
                     testcase: 'test/fixture/testcase.csv',
-                    browsers: ['phantomjs'],
+                    browsers: ['chrome'],
                     info: false,
                     debug: false
                 }).done(function(){
@@ -74,7 +74,7 @@
                 new WdCT({
                     interaction: 'test/fixture/interaction.js',
                     testcase: 'test/fixture/testcase.tsv',
-                    browsers: ['phantomjs'],
+                    browsers: ['chrome'],
                     info: false,
                     debug: false
                 }).done(function(){
@@ -87,7 +87,7 @@
                 new WdCT({
                     interaction: 'test/fixture/interaction.js',
                     testcase: 'test/fixture/testcase.xlsx',
-                    browsers: ['phantomjs'],
+                    browsers: ['chrome'],
                     info: false,
                     debug: false
                 }).done(function(){
@@ -100,7 +100,7 @@
                 new WdCT({
                     interaction: 'test/fixture/interaction.js',
                     testcase: 'test/fixture/testcase.xls',
-                    browsers: ['phantomjs'],
+                    browsers: ['chrome'],
                     info: false,
                     debug: false
                 }).done(function(){
@@ -114,7 +114,7 @@
                 new WdCT({
                     interaction: 'test/fixture/interaction.js',
                     testcase: 'test/fixture/testcase.csv',
-                    browsers: ['phantomjs'],
+                    browsers: ['chrome'],
                     infoLogger: infoLogger,
                     debug: false
                 }).done(function(){
@@ -129,7 +129,7 @@
                 new WdCT({
                     interaction: 'test/fixture/interaction.js',
                     testcase: 'test/fixture/testcase.csv',
-                    browsers: ['phantomjs'],
+                    browsers: ['chrome'],
                     info: false,
                     debugLogger: debugLogger
                 }).done(function(){
@@ -144,7 +144,7 @@
                 new WdCT({
                     interaction: 'test/fixture/interaction-failed.js',
                     testcase: 'test/fixture/testcase.csv',
-                    browsers: ['phantomjs'],
+                    browsers: ['chrome'],
                     info: false,
                     debug: false,
                     errorLogger: errorLogger
@@ -165,7 +165,7 @@
             //     new WdCT({
             //         interaction: 'test/fixture/interaction.js',
             //         testcase: 'test/fixture/testcase.csv',
-            //         browsers: ['phantomjs'],
+            //         browsers: ['chrome'],
             //         debugLogger: debugLogger,
             //         color: false
             //     }).done(function(){
@@ -180,7 +180,7 @@
                 new WdCT({
                     interaction: 'test/fixture/interaction-failed.js',
                     testcase: 'test/fixture/testcase.csv',
-                    browsers: ['phantomjs'],
+                    browsers: ['chrome'],
                     info: false,
                     debug: false,
                     error :false,
@@ -206,7 +206,7 @@
                 new WdCT({
                     interaction: 'test/fixture/interaction-not-enough.js',
                     testcase: 'test/fixture/testcase.xlsx',
-                    browsers: ['phantomjs'],
+                    browsers: ['chrome'],
                     info: false,
                     debug: false,
                     error: false
@@ -222,6 +222,24 @@
                     done(err);
                 });
             });
+
+            it('should throw error when browser error happend', function (done) {
+                new WdCT({
+                    interaction: 'test/fixture/interaction-browser-error.js',
+                    testcase: 'test/fixture/testcase-browser-error.csv',
+                    browsers: ['chrome'],
+                    info: false,
+                    debug: false,
+                    error: false,
+                    validBrowserError: true
+                }).done(function(){
+                    done('should throw error');
+                }, function(err){
+                    err.should.have.property('message').and.equal('http://localhost:8000/site.js 30:10 Uncaught Error: Throw Fantastic Error');
+                    done();
+                });
+            });
+
         });
         describe('execute with breakpoint', function () {
             it('should stop after each commands', function (done) {
@@ -230,7 +248,7 @@
                 new WdCT({
                     interaction: 'test/fixture/interaction.js',
                     testcase: 'test/fixture/testcase.csv',
-                    browsers: ['phantomjs'],
+                    browsers: ['chrome'],
                     info: false,
                     debug: false,
                     stepwise: true,
@@ -253,7 +271,7 @@
                 new WdCT({
                     interaction: 'test/fixture/interaction-failed.js',
                     testcase: 'test/fixture/testcase.csv',
-                    browsers: ['phantomjs'],
+                    browsers: ['chrome'],
                     info: false,
                     debug: false,
                     pauseOnError: true,
@@ -288,7 +306,7 @@
                 new WdCT({
                     interaction: 'test/fixture/interaction-hooks.js',
                     testcase: 'test/fixture/testcase.csv',
-                    browsers: ['phantomjs'],
+                    browsers: ['chrome'],
                     info: false,
                     debug: false,
                     promptLogger: promptLogger
@@ -304,7 +322,7 @@
                 new WdCT({
                     interaction: 'test/fixture/interaction.js',
                     testcase: 'test/fixture/testcase-with-numbering.csv',
-                    browsers: ['phantomjs'],
+                    browsers: ['chrome'],
                     startColumn: 1,
                     info: false,
                     debug: false
@@ -320,7 +338,7 @@
                 new WdCT({
                     interaction: 'test/fixture/interaction.js',
                     testcase: 'test/fixture/testcase.csv',
-                    browsers: ['phantomjs'],
+                    browsers: ['chrome'],
                     rowNum: 2,
                     infoLogger: infoLogger,
                     debug: false
@@ -339,7 +357,7 @@
                 new WdCT({
                     interaction: 'test/fixture/interaction-failed.js',
                     testcase: 'test/fixture/testcase.csv',
-                    browsers: ['phantomjs'],
+                    browsers: ['chrome'],
                     info: false,
                     debug: false,
                     errorLogger: errorLogger,
@@ -362,7 +380,7 @@
                 new WdCT({
                     interaction: 'test/fixture/interaction-foo-bar.js',
                     testcase: 'test/fixture/testcase.csv',
-                    browsers: ['phantomjs'],
+                    browsers: ['chrome'],
                     info: false,
                     debug: false,
                     store: {

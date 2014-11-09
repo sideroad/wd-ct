@@ -26,6 +26,10 @@
 			},1000);
 		});
 
+		$('#throw-error').click(function(){
+			throw new Error('Throw Fantastic Error');
+		});
+
 	});
 
 })(jQuery);
