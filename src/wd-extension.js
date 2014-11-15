@@ -72,16 +72,24 @@ module.exports = {
     wd.addPromiseChainMethod(
       'getBrowserErrors',
       function() {
+        var that = this;
+        return this.sessionCapabilities()
+                   .then(function(capabilities){
+                    if(capabilities.browserName === 'internet explorer') {
+                      logger('[WARN] Internet Explorer does not support [getBrowserErrors]');
+                      return [];
+                    } else {
+                      return that.log('browser')
+                                 .then(function(logs){
 
-        return this.log('browser')
-                   .then(function(logs){
-
-                     return _.chain(logs)
-                             .where({
-                               level: 'SEVERE'
-                             })
-                             .pluck('message')
-                             .value();
+                                   return _.chain(logs)
+                                           .where({
+                                             level: 'SEVERE'
+                                           })
+                                           .pluck('message')
+                                           .value();
+                                 });
+                    }
                    });
       }
     );

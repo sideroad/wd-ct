@@ -6,7 +6,36 @@
     var chai = require('chai'),
         spies = require('chai-spies'),
         prompt = require('prompt'),
-        site;
+        site,
+        browsers = [
+            {
+                browserName: 'internet explorer',
+                version: '8',
+                platform: 'Windows 7'
+            },
+            {
+                browserName: 'internet explorer',
+                version: '9',
+                platform: 'Windows 7'
+            },
+            {
+                browserName: 'internet explorer',
+                version: '10',
+                platform: 'Windows 7'
+            },
+            {
+                browserName: 'Chrome',
+                platform: 'Windows 7'
+            },
+            {
+                browserName: 'Firefox',
+                platform: 'Windows 7'
+            },
+            {
+                browserName: 'Safari',
+                platform: 'Mac'
+            }
+        ];
 
     chai.use(spies);
     chai.should();
@@ -32,18 +61,7 @@
                 new WdCT({
                     interaction: 'test/fixture/interaction-saucelabs.js',
                     testcase: 'test/fixture/testcase-saucelabs.csv',
-                    browsers: [
-                        {
-                            browserName: 'internet explorer',
-                            version: '9',
-                            platform: 'Windows 7'
-                        },
-                        {
-                            browserName: 'internet explorer',
-                            version: '10',
-                            platform: 'Windows 7'
-                        }
-                    ],
+                    browsers: browsers,
                     parallel: true,
                     saucelabs: true,
                     info: false,
@@ -61,7 +79,9 @@
                 new WdCT({
                     interaction: 'test/fixture/interaction.js',
                     testcase: 'test/fixture/testcase.csv',
-                    browsers: ['chrome'],
+                    browsers: browsers,
+                    parallel: true,
+                    saucelabs: true,
                     info: false,
                     debug: false
                 }).done(function(){
@@ -74,7 +94,10 @@
                 new WdCT({
                     interaction: 'test/fixture/interaction.js',
                     testcase: 'test/fixture/testcase.tsv',
-                    browsers: ['chrome'],
+                    browsers: browsers,
+                    parallel: true,
+                    saucelabs: true,
+
                     info: false,
                     debug: false
                 }).done(function(){
@@ -87,7 +110,10 @@
                 new WdCT({
                     interaction: 'test/fixture/interaction.js',
                     testcase: 'test/fixture/testcase.xlsx',
-                    browsers: ['chrome'],
+                    browsers: browsers,
+                    parallel: true,
+                    saucelabs: true,
+
                     info: false,
                     debug: false
                 }).done(function(){
@@ -100,7 +126,10 @@
                 new WdCT({
                     interaction: 'test/fixture/interaction.js',
                     testcase: 'test/fixture/testcase.xls',
-                    browsers: ['chrome'],
+                    browsers: browsers,
+                    parallel: true,
+                    saucelabs: true,
+
                     info: false,
                     debug: false
                 }).done(function(){
@@ -114,7 +143,9 @@
                 new WdCT({
                     interaction: 'test/fixture/interaction.js',
                     testcase: 'test/fixture/testcase.csv',
-                    browsers: ['chrome'],
+                    browsers: browsers,
+                    parallel: true,
+                    saucelabs: true,
                     infoLogger: infoLogger,
                     debug: false
                 }).done(function(){
@@ -129,7 +160,9 @@
                 new WdCT({
                     interaction: 'test/fixture/interaction.js',
                     testcase: 'test/fixture/testcase.csv',
-                    browsers: ['chrome'],
+                    browsers: browsers,
+                    parallel: true,
+                    saucelabs: true,
                     info: false,
                     debugLogger: debugLogger
                 }).done(function(){
@@ -144,7 +177,9 @@
                 new WdCT({
                     interaction: 'test/fixture/interaction-failed.js',
                     testcase: 'test/fixture/testcase.csv',
-                    browsers: ['chrome'],
+                    browsers: browsers,
+                    parallel: true,
+                    saucelabs: true,
                     info: false,
                     debug: false,
                     errorLogger: errorLogger
@@ -165,7 +200,7 @@
             //     new WdCT({
             //         interaction: 'test/fixture/interaction.js',
             //         testcase: 'test/fixture/testcase.csv',
-            //         browsers: ['chrome'],
+            //         browsers: browsers,
             //         debugLogger: debugLogger,
             //         color: false
             //     }).done(function(){
@@ -180,7 +215,9 @@
                 new WdCT({
                     interaction: 'test/fixture/interaction-failed.js',
                     testcase: 'test/fixture/testcase.csv',
-                    browsers: ['chrome'],
+                    browsers: browsers,
+                    parallel: true,
+                    saucelabs: true,
                     info: false,
                     debug: false,
                     error :false,
@@ -206,7 +243,9 @@
                 new WdCT({
                     interaction: 'test/fixture/interaction-not-enough.js',
                     testcase: 'test/fixture/testcase.xlsx',
-                    browsers: ['chrome'],
+                    browsers: browsers,
+                    parallel: true,
+                    saucelabs: true,
                     info: false,
                     debug: false,
                     error: false
@@ -227,7 +266,10 @@
                 new WdCT({
                     interaction: 'test/fixture/interaction-browser-error.js',
                     testcase: 'test/fixture/testcase-browser-error.csv',
-                    browsers: ['chrome'],
+                    browsers: browsers,
+                    parallel: true,
+                    saucelabs: true,
+
                     info: false,
                     debug: false,
                     error: false,
@@ -248,7 +290,9 @@
                 new WdCT({
                     interaction: 'test/fixture/interaction.js',
                     testcase: 'test/fixture/testcase.csv',
-                    browsers: ['chrome'],
+                    browsers: browsers,
+                    parallel: true,
+                    saucelabs: true,
                     info: false,
                     debug: false,
                     stepwise: true,
@@ -271,7 +315,9 @@
                 new WdCT({
                     interaction: 'test/fixture/interaction-failed.js',
                     testcase: 'test/fixture/testcase.csv',
-                    browsers: ['chrome'],
+                    browsers: browsers,
+                    parallel: true,
+                    saucelabs: true,
                     info: false,
                     debug: false,
                     pauseOnError: true,
@@ -306,7 +352,9 @@
                 new WdCT({
                     interaction: 'test/fixture/interaction-hooks.js',
                     testcase: 'test/fixture/testcase.csv',
-                    browsers: ['chrome'],
+                    browsers: browsers,
+                    parallel: true,
+                    saucelabs: true,
                     info: false,
                     debug: false,
                     promptLogger: promptLogger
@@ -322,7 +370,9 @@
                 new WdCT({
                     interaction: 'test/fixture/interaction.js',
                     testcase: 'test/fixture/testcase-with-numbering.csv',
-                    browsers: ['chrome'],
+                    browsers: browsers,
+                    parallel: true,
+                    saucelabs: true,
                     startColumn: 1,
                     info: false,
                     debug: false
@@ -338,7 +388,9 @@
                 new WdCT({
                     interaction: 'test/fixture/interaction.js',
                     testcase: 'test/fixture/testcase.csv',
-                    browsers: ['chrome'],
+                    browsers: browsers,
+                    parallel: true,
+                    saucelabs: true,
                     rowNum: 2,
                     infoLogger: infoLogger,
                     debug: false
@@ -357,7 +409,9 @@
                 new WdCT({
                     interaction: 'test/fixture/interaction-failed.js',
                     testcase: 'test/fixture/testcase.csv',
-                    browsers: ['chrome'],
+                    browsers: browsers,
+                    parallel: true,
+                    saucelabs: true,
                     info: false,
                     debug: false,
                     errorLogger: errorLogger,
@@ -380,7 +434,9 @@
                 new WdCT({
                     interaction: 'test/fixture/interaction-foo-bar.js',
                     testcase: 'test/fixture/testcase.csv',
-                    browsers: ['chrome'],
+                    browsers: browsers,
+                    parallel: true,
+                    saucelabs: true,
                     info: false,
                     debug: false,
                     store: {

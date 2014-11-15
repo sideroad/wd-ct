@@ -6,7 +6,7 @@ module.exports = function(wd){
         return this.get(url);
       },
       'click first link': function(){
-        return this.waitForElementByCss('h2:nth-child(2) > a')
+        return this.waitForElementByCss('h2 > a')
                    .click();
       }
     },

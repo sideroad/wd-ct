@@ -41,10 +41,9 @@
             wdExtension.adapt(wd, store, function(){});
 
             it('should get browser error', function (done) {
-                var b = wd.promiseChainRemote();
+                var b = wd.promiseChainRemote("ondemand.saucelabs.com", 80, process.env.SAUCE_USERNAME, process.env.SAUCE_ACCESS_KEY );
                 b.init({
-                    browserName: 'chrome',
-                    port: server.port
+                    browserName: 'chrome'
                  })
                  .get('http://localhost:8000/')
                  .getBrowserErrors()
@@ -63,6 +62,28 @@
                     done(err);
                  });
             });
+            it('should output log for unsupported warnings on IE', function (done) {
+                var b = wd.promiseChainRemote("ondemand.saucelabs.com", 80, process.env.SAUCE_USERNAME, process.env.SAUCE_ACCESS_KEY );
+                b.init({
+                    browserName: 'internet explorer'
+                 })
+                 .get('http://localhost:8000/')
+                 .getBrowserErrors()
+                 .then(function(errs){
+                    errs.should.have.length(0);
+                 })
+                 .elementByCss('#throw-error')
+                 .click()
+                 .getBrowserErrors()
+                 .then(function(errs){
+                    errs.should.have.length(0);
+                 })
+                 .done(function(){
+                    done();
+                 }, function(err){
+                    done(err);
+                 });
+            });
         });
 
         describe('fire', function () {
@@ -72,10 +93,9 @@
             wdExtension.adapt(wd, store, function(){});
 
             it('should fire events', function (done) {
-                var b = wd.promiseChainRemote();
+                var b = wd.promiseChainRemote("ondemand.saucelabs.com", 80, process.env.SAUCE_USERNAME, process.env.SAUCE_ACCESS_KEY );
                 b.init({
-                    browserName: 'chrome',
-                    port: server.port
+                    browserName: 'chrome'
                  })
                  .get('http://localhost:8000/')
                  .elementByCss('#text')
@@ -104,11 +124,9 @@
             wdExtension.adapt(wd, store, function(){});
 
             it('should type and fire events', function (done) {
-                var b = wd.promiseChainRemote();
-
+                var b = wd.promiseChainRemote("ondemand.saucelabs.com", 80, process.env.SAUCE_USERNAME, process.env.SAUCE_ACCESS_KEY );
                 b.init({
-                    browserName: 'chrome',
-                    port: server.port
+                    browserName: 'chrome'
                  })
                  .get('http://localhost:8000/')
                  .elementByCss('#text')
@@ -143,11 +161,9 @@
             wdExtension.adapt(wd, store, function(){});
 
             it('should select option', function (done) {
-                var b = wd.promiseChainRemote();
-
+                var b = wd.promiseChainRemote("ondemand.saucelabs.com", 80, process.env.SAUCE_USERNAME, process.env.SAUCE_ACCESS_KEY );
                 b.init({
-                    browserName: 'chrome',
-                    port: server.port
+                    browserName: 'chrome'
                  })
                  .get('http://localhost:8000/')
                  .elementByCss('#selectbox')
@@ -188,10 +204,9 @@
                     breakpoint: ' '
                 };
 
-                var b = wd.promiseChainRemote();
+                var b = wd.promiseChainRemote("ondemand.saucelabs.com", 80, process.env.SAUCE_USERNAME, process.env.SAUCE_ACCESS_KEY );
                 b.init({
-                    browserName: 'chrome',
-                    port: server.port
+                    browserName: 'chrome'
                  })
                  .get('http://localhost:8000/')
                  .url()
@@ -247,10 +262,9 @@
                     
                 wdExtension.adapt(wd, store, breakLogger);
 
-                var b = wd.promiseChainRemote();
+                var b = wd.promiseChainRemote("ondemand.saucelabs.com", 80, process.env.SAUCE_USERNAME, process.env.SAUCE_ACCESS_KEY );
                 b.init({
-                    browserName: 'chrome',
-                    port: server.port
+                    browserName: 'chrome'
                  })
                  .get('http://localhost:8000/')
                  .url()
