@@ -88,7 +88,7 @@ module.exports = {
                                            })
                                            .pluck('message')
                                            .filter(function(mes){
-                                             return /(EvalError|InternalError|RangeError|ReferenceError|SyntaxError|TypeError|URIError|)/.test(mes);
+                                             return /(EvalError|InternalError|RangeError|ReferenceError|SyntaxError|TypeError|URIError)/.test(mes);
                                            })
                                            .value();
                                  });
