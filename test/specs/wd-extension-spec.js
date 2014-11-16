@@ -56,6 +56,9 @@
                  .then(function(errs){
                     errs.should.have.length(1);
                  })
+                 .then(function(){
+                    return b.quit();
+                 })
                  .done(function(){
                     done();
                  }, function(err){
@@ -77,6 +80,9 @@
                  .getBrowserErrors()
                  .then(function(errs){
                     errs.should.have.length(0);
+                 })
+                 .then(function(){
+                    return b.quit();
                  })
                  .done(function(){
                     done();

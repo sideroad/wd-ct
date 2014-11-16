@@ -87,6 +87,9 @@ module.exports = {
                                              level: 'SEVERE'
                                            })
                                            .pluck('message')
+                                           .filter(function(mes){
+                                             return /(EvalError|InternalError|RangeError|ReferenceError|SyntaxError|TypeError|URIError|)/.test(mes);
+                                           })
                                            .value();
                                  });
                     }
