@@ -81,12 +81,14 @@ var WdCT = function(options){
   rowNum = options.rowNum;
   saucelabs = options.saucelabs;
   parallel = options.parallel;
-  remote = saucelabs ? [
-    "ondemand.saucelabs.com",
-    80,
-    saucelabs === true ? process.env.SAUCE_USERNAME   : saucelabs.username,
-    saucelabs === true ? process.env.SAUCE_ACCESS_KEY : saucelabs.accesskey
-  ] : undefined;
+  remote = options.remote ? options.remote : 
+           saucelabs ? [
+             "ondemand.saucelabs.com",
+             80,
+             saucelabs === true ? process.env.SAUCE_USERNAME   : saucelabs.username,
+             saucelabs === true ? process.env.SAUCE_ACCESS_KEY : saucelabs.accesskey
+           ] : 
+           undefined;
   info = options.info ? function(mes){
     infoLogger(mes.blue);
   } : function(){};
