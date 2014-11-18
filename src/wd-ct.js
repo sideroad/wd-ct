@@ -14,6 +14,7 @@ var async = require('async'),
     chaiAsPromised = require('chai-as-promised'),
     Q = require('q'),
     path = require('path'),
+    fs = require('fs'),
     SeleniumServer = require('./setup-server'),
     loadTestcase = require('./load-testcase'),
     wdExtension = require('./wd-extension');
@@ -56,9 +57,9 @@ var WdCT = function(options){
     pauseOnError: false,
     force: false,
     startColumn: 0,
-    infoLogger: console.log,
-    debugLogger: console.log,
-    errorLogger: console.log,
+    infoLogger: {write:function(mes){console.log(mes.blue.replace(/\n$/, ''));}},
+    debugLogger: {write:function(mes){console.log(mes.replace(/\n$/, ''));}},
+    errorLogger: {write:function(mes){console.log(mes.red.replace(/\n$/, ''));}},
     promptLogger: console.log,
     parallel: false,
     rowNum: undefined,
@@ -74,9 +75,9 @@ var WdCT = function(options){
   errorScreenshot = options.errorScreenshot;
   pauseOnError = options.pauseOnError;
   force = options.force;
-  infoLogger = options.infoLogger;
-  debugLogger = options.debugLogger;
-  errorLogger = options.errorLogger;
+  infoLogger = typeof options.info === 'string' ? fs.createWriteStream(options.info) : options.infoLogger;
+  debugLogger = typeof options.debug === 'string' ? fs.createWriteStream(options.debug) : options.debugLogger;
+  errorLogger = typeof options.error === 'string' ? fs.createWriteStream(options.error) : options.errorLogger;
   promptLogger = options.promptLogger;
   rowNum = options.rowNum;
   saucelabs = options.saucelabs;
@@ -90,11 +91,13 @@ var WdCT = function(options){
            ] : 
            undefined;
   info = options.info ? function(mes){
-    infoLogger(mes.blue);
+    infoLogger.write(mes+'\n');
   } : function(){};
-  debug = options.debug ? function(){
-    debugLogger.apply(debugLogger, arguments);
+
+  debug = options.debug ? function(mes){
+    debugLogger.write(mes+'\n');
   } : function(){};
+
   error = options.error ? function(err){
     var mes = err.message;
     mes += err.col ? '\n column['+err.col+']' : '';
@@ -102,7 +105,7 @@ var WdCT = function(options){
     mes += err.command ? '\n command['+err.command+']' : '';
     mes += err.val ? '\n val['+err.val+']' : '';
 
-    errorLogger.apply(errorLogger, [mes.red]);
+    errorLogger.write(mes+'\n');
   } : function(){};
   validBrowserError = options.validBrowserError;
 

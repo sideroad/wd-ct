@@ -10,25 +10,7 @@
         browsers = [
             {
                 browserName: 'internet explorer',
-                version: '8',
-                platform: 'Windows 7'
-            },
-            {
-                browserName: 'internet explorer',
-                version: '9',
-                platform: 'Windows 7'
-            },
-            {
-                browserName: 'internet explorer',
                 version: '10',
-                platform: 'Windows 7'
-            },
-            {
-                browserName: 'Chrome',
-                platform: 'Windows 7'
-            },
-            {
-                browserName: 'Firefox',
                 platform: 'Windows 7'
             },
             {
@@ -57,15 +39,15 @@
         var WdCT = require('../../src/wd-ct');
 
         describe('execute saucelabs testcase', function () {
-            it('should succeed CSV test', function (done) {
+            it('should succeed test on saucelabs', function (done) {
                 new WdCT({
                     interaction: 'test/fixture/interaction-saucelabs.js',
                     testcase: 'test/fixture/testcase-saucelabs.csv',
                     browsers: browsers,
                     parallel: true,
                     saucelabs: true,
-                    info: false,
-                    debug: false
+                    info: 'tmp/info.log',
+                    debug: 'tmp/debug.log'
                 }).done(function(){
                     done();
                 }, function(err){
@@ -74,7 +56,7 @@
             });
         });
 
-        describe('execute test', function () {
+        describe('execute test in each file type', function () {
             it('should succeed CSV test', function (done) {
                 new WdCT({
                     interaction: 'test/fixture/interaction.js',
@@ -97,7 +79,6 @@
                     browsers: browsers,
                     parallel: true,
                     saucelabs: true,
-
                     info: false,
                     debug: false
                 }).done(function(){
@@ -113,7 +94,6 @@
                     browsers: browsers,
                     parallel: true,
                     saucelabs: true,
-
                     info: false,
                     debug: false
                 }).done(function(){
@@ -138,6 +118,9 @@
                     done(err);
                 });
             });
+        });
+
+        describe('logging', function () {
             it('should logging info information', function (done) {
                 var infoLogger = chai.spy(function(){});
                 new WdCT({
@@ -146,7 +129,7 @@
                     browsers: browsers,
                     parallel: true,
                     saucelabs: true,
-                    infoLogger: infoLogger,
+                    infoLogger: {write:infoLogger},
                     debug: false
                 }).done(function(){
                     infoLogger.should.have.been.called.gt(1);
@@ -164,7 +147,7 @@
                     parallel: true,
                     saucelabs: true,
                     info: false,
-                    debugLogger: debugLogger
+                    debugLogger: {write:debugLogger}
                 }).done(function(){
                     debugLogger.should.have.been.called.gt(1);
                     done();
@@ -182,7 +165,7 @@
                     saucelabs: true,
                     info: false,
                     debug: false,
-                    errorLogger: errorLogger
+                    errorLogger: {write:errorLogger}
                 }).done(function(){
                     done('should failed');                    
                 }, function(){
@@ -210,6 +193,10 @@
             //         done(err);
             //     });
             // });
+            // 
+        });
+
+        describe('exception handling', function () {
 
             it('should fail and interrupted', function (done) {
                 new WdCT({
@@ -322,7 +309,7 @@
                     debug: false,
                     pauseOnError: true,
                     promptLogger: promptLogger,
-                    errorLogger: errorLogger
+                    errorLogger: {write:errorLogger}
                 }).then(function(){
                     throw new Error('should fail');
                 }, function(err){
@@ -392,7 +379,7 @@
                     parallel: true,
                     saucelabs: true,
                     rowNum: 2,
-                    infoLogger: infoLogger,
+                    infoLogger: {write:infoLogger},
                     debug: false
                 }).done(function(){
                     infoLogger.should.have.been.called.exactly(4);
@@ -414,7 +401,7 @@
                     saucelabs: true,
                     info: false,
                     debug: false,
-                    errorLogger: errorLogger,
+                    errorLogger: {write:errorLogger},
                     force: true
                 }).then(function(){
                     // error should be occurred twice.
