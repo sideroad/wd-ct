@@ -307,15 +307,6 @@ var WdCT = function(options){
         var teardown = function(err){
           debug(('Teardown browser ['+browserName+']').grey);
 
-          if(infoLogger.end){
-            infoLogger.end();
-          }
-          if(debugLogger.end){
-            debugLogger.end();
-          }
-          if(errorLogger.end){
-            errorLogger.end();
-          }
           return browser.quit().then(function(){
             callback(err);
           });
@@ -335,6 +326,17 @@ var WdCT = function(options){
         }).done();
       });
     }, function(err){
+
+      if(infoLogger.end){
+        infoLogger.end();
+      }
+      if(debugLogger.end){
+        debugLogger.end();
+      }
+      if(errorLogger.end){
+        errorLogger.end();
+      }
+
       if(server) {
         server.kill();
       }
