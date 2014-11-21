@@ -14,25 +14,25 @@
     chai.use(spies);
     chai.should();
 
-    describe('addPromiseChainMethod', function () {
 
-        before(function(done){
-            prompt.override = {
-                breakpoint: ' '
-            };
-            server = new SeleniumServer();
-            server.on('start', function(){
+    before(function(done){
+        prompt.override = {
+            breakpoint: ' '
+        };
+        server = new SeleniumServer();
+        server.on('start', function(){
 
-                var Site = require('../helpers/setup-site');
-                site = new Site();
-                done();
-            });
-        });
-        after(function(done){
-            server.kill();
+            var Site = require('../helpers/setup-site');
+            site = new Site();
             done();
         });
+    });
+    after(function(done){
+        server.kill();
+        done();
+    });
 
+    describe('addPromiseChainMethod', function () {
 
         describe('getBrowserErrors', function () {
             var store = {},
@@ -80,111 +80,6 @@
                  .getBrowserErrors()
                  .then(function(errs){
                     errs.should.have.length(0);
-                 })
-                 .then(function(){
-                    return b.quit();
-                 })
-                 .done(function(){
-                    done();
-                 }, function(err){
-                    done(err);
-                 });
-            });
-        });
-
-        describe('fire', function () {
-            var store = {},
-                wd = require('wd');
-
-            wdExtension.adapt(wd, store, function(){});
-
-            it('should fire events', function (done) {
-                var b = wd.promiseChainRemote();
-                b.init({
-                    browserName: 'firefox'
-                 })
-                 .get('http://localhost:8000/')
-                 .elementByCss('#text')
-                 .type('abcde')
-                 .fire('change')
-                 .elementByCss('#logger')
-                 .text()
-                 .then(function(text){
-                    text.should.equal('abcde');
-                 })
-                 .then(function(){
-                    return b.quit();
-                 })
-                 .done(function(){
-                    done();
-                 }, function(err){
-                    done(err);
-                 });
-            });
-        });
-
-        describe('naturalType', function () {
-            var store = {},
-                wd = require('wd');
-
-            wdExtension.adapt(wd, store, function(){});
-
-            it('should type and fire events', function (done) {
-                var b = wd.promiseChainRemote();
-                b.init({
-                    browserName: 'firefox'
-                 })
-                 .get('http://localhost:8000/')
-                 .elementByCss('#text')
-                 .naturalType('abcde')
-                 .elementByCss('#logger')
-                 .text()
-                 .then(function(text){
-                    text.should.equal('abcde');
-                 })
-                 .elementByCss('#text')
-                 .naturalType('12345')
-                 .elementByCss('#logger')
-                 .text()
-                 .then(function(text){
-                    text.should.equal('12345');
-                 })
-                 .then(function(){
-                    return b.quit();
-                 })
-                 .done(function(){
-                    done();
-                 }, function(err){
-                    done(err);
-                 });
-            });
-        });
-
-        describe('select', function () {
-            var store = {},
-                wd = require('wd');
-
-            wdExtension.adapt(wd, store, function(){});
-
-            it('should select option', function (done) {
-                var b = wd.promiseChainRemote();
-                b.init({
-                    browserName: 'firefox'
-                 })
-                 .get('http://localhost:8000/')
-                 .elementByCss('#selectbox')
-                 .select('b')
-                 .elementByCss('#logger')
-                 .text()
-                 .then(function(text){
-                    text.should.equal('2');
-                 })
-                 .elementByCss('#selectbox')
-                 .select('c')
-                 .elementByCss('#logger')
-                 .text()
-                 .then(function(text){
-                    text.should.equal('3');
                  })
                  .then(function(){
                     return b.quit();
@@ -305,6 +200,115 @@
                  });
             });
 
+        });
+
+    });
+
+    describe('addElementPromiseChainMethod', function () {
+
+        describe('fire', function () {
+            var store = {},
+                wd = require('wd');
+
+            wdExtension.adapt(wd, store, function(){});
+
+            it('should fire events', function (done) {
+                var b = wd.promiseChainRemote();
+                b.init({
+                    browserName: 'firefox'
+                 })
+                 .get('http://localhost:8000/')
+                 .elementByCss('#text')
+                 .type('abcde')
+                 .fire('change')
+                 .elementByCss('#logger')
+                 .text()
+                 .then(function(text){
+                    text.should.equal('abcde');
+                 })
+                 .then(function(){
+                    return b.quit();
+                 })
+                 .done(function(){
+                    done();
+                 }, function(err){
+                    done(err);
+                 });
+            });
+        });
+
+        describe('naturalType', function () {
+            var store = {},
+                wd = require('wd');
+
+            wdExtension.adapt(wd, store, function(){});
+
+            it('should type and fire events', function (done) {
+                var b = wd.promiseChainRemote();
+                b.init({
+                    browserName: 'firefox'
+                 })
+                 .get('http://localhost:8000/')
+                 .elementByCss('#text')
+                 .naturalType('abcde')
+                 .elementByCss('#logger')
+                 .text()
+                 .then(function(text){
+                    text.should.equal('abcde');
+                 })
+                 .elementByCss('#text')
+                 .naturalType('12345')
+                 .elementByCss('#logger')
+                 .text()
+                 .then(function(text){
+                    text.should.equal('12345');
+                 })
+                 .then(function(){
+                    return b.quit();
+                 })
+                 .done(function(){
+                    done();
+                 }, function(err){
+                    done(err);
+                 });
+            });
+        });
+
+        describe('select', function () {
+            var store = {},
+                wd = require('wd');
+
+            wdExtension.adapt(wd, store, function(){});
+
+            it('should select option', function (done) {
+                var b = wd.promiseChainRemote();
+                b.init({
+                    browserName: 'firefox'
+                 })
+                 .get('http://localhost:8000/')
+                 .elementByCss('#selectbox')
+                 .select('b')
+                 .elementByCss('#logger')
+                 .text()
+                 .then(function(text){
+                    text.should.equal('2');
+                 })
+                 .elementByCss('#selectbox')
+                 .select('c')
+                 .elementByCss('#logger')
+                 .text()
+                 .then(function(text){
+                    text.should.equal('3');
+                 })
+                 .then(function(){
+                    return b.quit();
+                 })
+                 .done(function(){
+                    done();
+                 }, function(err){
+                    done(err);
+                 });
+            });
         });
 
     });	

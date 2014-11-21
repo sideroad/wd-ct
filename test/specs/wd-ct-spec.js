@@ -7,6 +7,7 @@
         spies = require('chai-spies'),
         prompt = require('prompt'),
         site,
+        fs = require('fs'),
         browsers = ['firefox'];
 
     chai.use(spies);
@@ -34,9 +35,8 @@
                     interaction: 'test/fixture/interaction.js',
                     testcase: 'test/fixture/testcase.csv',
                     browsers: browsers,
-                    color: false,
-                    info: 'tmp/info.log',
-                    debug: 'tmp/debug.log'
+                    info: false,
+                    debug: false
                 }).done(function(){
                     done();
                 }, function(err){
@@ -63,9 +63,8 @@
                     ],
                     parallel: true,
                     saucelabs: true,
-                    color: false,
-                    info: 'tmp/info.log',
-                    debug: 'tmp/debug.log'
+                    info: false,
+                    debug: false
                 }).done(function(){
                     done();
                 }, function(err){
@@ -75,73 +74,47 @@
         });
 
         describe('logging', function () {
-            it('should logging info information', function (done) {
-                var infoLogger = chai.spy();
-                new WdCT({
-                    interaction: 'test/fixture/interaction.js',
-                    testcase: 'test/fixture/testcase.csv',
-                    browsers: browsers,
-                    infoLogger: {write:infoLogger},
-                    debug: false
-                }).done(function(){
-                    infoLogger.should.have.been.called.gt(1);
-                    done();
-                }, function(err){
-                    done(err);
-                });
-            });
-            it('should logging debug information', function (done) {
-                var debugLogger = chai.spy();
-                new WdCT({
-                    interaction: 'test/fixture/interaction.js',
-                    testcase: 'test/fixture/testcase.csv',
-                    browsers: browsers,
-                    info: false,
-                    debugLogger: {write:debugLogger}
-                }).done(function(){
-                    debugLogger.should.have.been.called.gt(1);
-                    done();
-                }, function(err){
-                    done(err);
-                });
-            });
-            it('should logging error information', function (done) {
-                var errorLogger = chai.spy();
+            it('should logging information', function (done) {
+                var infoLogger = chai.spy(),
+                    debugLogger = chai.spy(),
+                    errorLogger = chai.spy();
+
                 new WdCT({
                     interaction: 'test/fixture/interaction-failed.js',
                     testcase: 'test/fixture/testcase.csv',
                     browsers: browsers,
-                    info: false,
-                    debug: false,
+                    infoLogger: {write:infoLogger},
+                    debugLogger: {write:debugLogger},
                     errorLogger: {write:errorLogger}
                 }).done(function(){
                     done('should failed');                    
                 }, function(){
-                    // error should be occurred once.
+                    infoLogger.should.have.been.called.gt(1);
+                    debugLogger.should.have.been.called.gt(1);
                     errorLogger.should.have.been.called.once;
 
                     done();
                 });
             });
+            it('should output logging file', function (done) {
+                new WdCT({
+                    interaction: 'test/fixture/interaction-failed.js',
+                    testcase: 'test/fixture/testcase.csv',
+                    browsers: browsers,
+                    color: false,
+                    info: 'tmp/info.log',
+                    debug: 'tmp/debug.log',
+                    error: 'tmp/error.log'
+                }).done(function(){
+                    done('should failed');                    
+                }, function(){
+                    fs.existsSync('tmp/info.log').should.equal(true);
+                    fs.existsSync('tmp/debug.log').should.equal(true);
+                    fs.existsSync('tmp/error.log').should.equal(true);
 
-            // it('should ignore colored logging', function (done) {
-            //     var debugLogger = chai.spy(function(message){
-            //                         message.should.have.equal(message.red);
-            //                       });
-            //     new WdCT({
-            //         interaction: 'test/fixture/interaction.js',
-            //         testcase: 'test/fixture/testcase.csv',
-            //         browsers: browsers,
-            //         debugLogger: debugLogger,
-            //         color: false
-            //     }).done(function(){
-            //         debugLogger.should.have.been.called.gt(1);
-            //         done();                    
-            //     }, function(err){
-            //         done(err);
-            //     });
-            // });
-            // 
+                    done();
+                });
+            });
         });
 
         describe('exception handling', function () {
@@ -250,7 +223,6 @@
                     interaction: 'test/fixture/interaction-failed.js',
                     testcase: 'test/fixture/testcase.csv',
                     browsers: browsers,
-                    saucelabs: true,
                     info: false,
                     debug: false,
                     pauseOnError: true,
@@ -271,6 +243,35 @@
 
                     // error should be occurred only once.
                     errorLogger.should.have.been.called.once;
+                }).done(function(){
+                    done();
+                }, function(err){
+                    done(err);
+                });
+            });
+            it('should stop when error happend even force mode', function (done) {
+                var promptLogger = chai.spy(),
+                    errorLogger = chai.spy();
+
+                new WdCT({
+                    interaction: 'test/fixture/interaction-failed.js',
+                    testcase: 'test/fixture/testcase.csv',
+                    browsers: browsers,
+                    info: false,
+                    debug: false,
+                    pauseOnError: true,
+                    force: true,
+                    promptLogger: promptLogger,
+                    errorLogger: {write:errorLogger}
+                }).then(function(){
+
+                    // prompt should be call only twice.
+                    promptLogger.should.have.been.called.exactly(2 * browsers.length);
+
+                    // error should be occurred only twice.
+                    errorLogger.should.have.been.called.exactly(2 * browsers.length);
+                }, function(err){
+                    throw err;
                 }).done(function(){
                     done();
                 }, function(err){
