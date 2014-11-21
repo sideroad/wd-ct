@@ -329,6 +329,9 @@ var WdCT = function(options){
         var teardown = function(err){
           debug(('Teardown browser ['+browserName+']').grey);
 
+          if(saucelabs) {
+            browser = browser.sauceJobStatus(!err);
+          }
           return browser.quit().then(function(){
             callback(err);
           });
