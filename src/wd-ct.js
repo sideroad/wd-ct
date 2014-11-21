@@ -23,6 +23,7 @@ var WdCT = function(options){
   var info,
       debug,
       error,
+      reporter,
       testcase,
       server,
       interaction,
@@ -57,6 +58,7 @@ var WdCT = function(options){
     pauseOnError: false,
     force: false,
     startColumn: 0,
+    reporter: function(){},
     infoLogger: {write:function(mes){console.log(mes.blue.replace(/\n$/, ''));}},
     debugLogger: {write:function(mes){console.log(mes.replace(/\n$/, ''));}},
     errorLogger: {write:function(mes){console.log(mes.red.replace(/\n$/, ''));}},
@@ -68,6 +70,7 @@ var WdCT = function(options){
   }, options);
 
   _store = _.extend({}, options.store);
+  reporter = options.reporter;
   testcase = options.testcase;
   interaction = options.interaction;
   stepwise = options.stepwise;
@@ -117,13 +120,12 @@ var WdCT = function(options){
 
     // Geld colors
     _.map( colors, function(val, key){
-      if( typeof val === 'function' && !String.prototype.hasOwnProperty(key)){
-        Object.defineProperty( String.prototype, key, {
-          get: function(){
-            return this;
-          }
-        });
-      }
+      Object.defineProperty( String.prototype, key, {
+        configurable: true,
+        get: function(){
+          return this;
+        }
+      });
     });
   }
 
@@ -198,8 +200,13 @@ var WdCT = function(options){
           loadTestcase(testcase, startColumn, callback);
         },
         function execute(header, body, callback){
-          var queue = function(command, fn, val, col, row){
-                
+          var queue = function(args){
+                var command = args.command,
+                    fn = args.fn,
+                    val = args.val,
+                    col = args.col,
+                    row = args.row;
+
                 if(!fn){
                   promise = promise.then(function(){
                     var err = new Error();
@@ -224,7 +231,28 @@ var WdCT = function(options){
                       });
                     });
                   }
-                  return dfd;
+                  return dfd.then(function(){
+                      reporter({
+                        command: command,
+                        val: val,
+                        col: col,
+                        row: row,
+                        cap: sessionCapabilities
+                      });
+                    },
+                    function(err){
+                      reporter({
+                        command: command,
+                        val: val,
+                        col: col,
+                        row: row,
+                        err: err,
+                        cap: sessionCapabilities
+                      });
+
+                      throw err;
+                    }
+                  );
                 });
 
                 promise = promise.fail(function(err){
@@ -294,7 +322,13 @@ var WdCT = function(options){
               afterEach = commands.afterEach;
 
           if(commands.before) {
-            queue('before', commands.before, '', null, null);
+            queue({
+              command: 'before', 
+              fn: commands.before,
+              val: '',
+              col: null,
+              row: null
+            });
           }
 
           if(rowNum) {
@@ -302,32 +336,61 @@ var WdCT = function(options){
           }
 
           _.each(body, function(data, row){
-            var asserts;
+            var asserts = data[data.length -1].split(/\r?\n\r?\n/);
 
             if(beforeEach) {
-              queue('beforeEach', beforeEach, '', null, null);
+              queue({
+                command: 'beforeEach',
+                fn: beforeEach,
+                val: '',
+                col: null,
+                row: null
+              });
             }
-
-            asserts = data[data.length -1];
 
             // queuing input interaction
             header.forEach(function(key, col){
               var val = data[col];
-              queue( key, commands.input[key], val, col + 1, row + 2);
+              queue({
+                command: key,
+                fn: commands.input[key],
+                val: val,
+                col: col + 1,
+                row: row + 2
+              });
             });
 
             // queuing assertion interaction
-            asserts.split(/\r?\n\r?\n/).forEach(function(assert){
-              queue( assert, commands.assertion[assert], '', header.length + 1, row + 2 );
+            asserts.forEach(function(assert){
+              queue({
+                command: assert,
+                fn: commands.assertion[assert],
+                val: '',
+                col: header.length + 1,
+                row: row + 2
+              });
             });
 
             if(afterEach) {
-              queue('afterEach', afterEach, '', null, null);
+              queue({
+                command: 'afterEach',
+                fn: afterEach,
+                val: '',
+                col: null,
+                row: null,
+                asserts: asserts
+              });
             }
           });
 
           if(commands.after) {
-            queue('after', commands.after, '', null, null);
+            queue({
+              command: 'after',
+              fn: commands.after,
+              val: '',
+              col: null,
+              row: null
+            });
           }
 
           callback();

@@ -14,7 +14,6 @@
     chai.use(spies);
     chai.should();
 
-
     describe('WbCT', function () {
 
         before(function(done){
@@ -88,14 +87,16 @@
                     infoLogger: {write:infoLogger},
                     debugLogger: {write:debugLogger},
                     errorLogger: {write:errorLogger}
-                }).done(function(){
-                    done('should failed');                    
+                }).then(function(){
+                    throw new Error('should failed');                    
                 }, function(){
                     infoLogger.should.have.been.called.gt(1);
                     debugLogger.should.have.been.called.gt(1);
                     errorLogger.should.have.been.called.once;
-
+                }).done(function(){
                     done();
+                },function(err){
+                    done(err);
                 });
             });
             it('should output logging file', function (done) {
@@ -107,14 +108,37 @@
                     info: 'tmp/info.log',
                     debug: 'tmp/debug.log',
                     error: 'tmp/error.log'
-                }).done(function(){
-                    done('should failed');                    
+                }).then(function(){
+                    throw new Error('should failed');                    
                 }, function(){
                     fs.existsSync('tmp/info.log').should.equal(true);
                     fs.existsSync('tmp/debug.log').should.equal(true);
                     fs.existsSync('tmp/error.log').should.equal(true);
-
+                }).done(function(){
                     done();
+                },function(err){
+                    done(err);
+                });
+            });
+            it('should execute reporter', function (done) {
+                var reporter  = chai.spy();
+                new WdCT({
+                    interaction: 'test/fixture/interaction-failed.js',
+                    testcase: 'test/fixture/testcase.csv',
+                    browsers: browsers,
+                    color: false,
+                    info: false,
+                    debug: false,
+                    error: false,
+                    reporter: reporter
+                }).then(function(){
+                    throw new Error('should failed');                    
+                }, function(){
+                    reporter.should.have.been.called.exactly(4);
+                }).done(function(){
+                    done();
+                },function(err){
+                    done(err);
                 });
             });
         });
