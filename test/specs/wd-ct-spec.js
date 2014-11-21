@@ -7,17 +7,7 @@
         spies = require('chai-spies'),
         prompt = require('prompt'),
         site,
-        browsers = [
-            {
-                browserName: 'internet explorer',
-                platform: 'Windows 7',
-                version: '10',
-            },
-            {
-                browserName: 'chrome',
-                platform: 'OS X 10.9'
-            }
-        ];
+        browsers = ['firefox'];
 
     chai.use(spies);
     chai.should();
@@ -38,14 +28,13 @@
 
         var WdCT = require('../../src/wd-ct');
 
-        describe('execute saucelabs testcase', function () {
-            it('should succeed test on saucelabs', function (done) {
+        describe('execute testcase on local', function () {
+            it('should succeed test on local', function (done) {
                 new WdCT({
-                    interaction: 'test/fixture/interaction-saucelabs.js',
-                    testcase: 'test/fixture/testcase-saucelabs.csv',
+                    interaction: 'test/fixture/interaction.js',
+                    testcase: 'test/fixture/testcase.csv',
                     browsers: browsers,
-                    parallel: true,
-                    saucelabs: true,
+                    color: false,
                     info: 'tmp/info.log',
                     debug: 'tmp/debug.log'
                 }).done(function(){
@@ -56,61 +45,27 @@
             });
         });
 
-        describe('execute test in each file type', function () {
-            it('should succeed CSV test', function (done) {
+        describe('execute testcase on saucelabs', function () {
+            it('should succeed test on saucelabs', function (done) {
                 new WdCT({
                     interaction: 'test/fixture/interaction.js',
                     testcase: 'test/fixture/testcase.csv',
-                    browsers: browsers,
+                    browsers: [
+                        {
+                            browserName: 'internet explorer',
+                            platform: 'Windows 7',
+                            version: '10',
+                        },
+                        {
+                            browserName: 'chrome',
+                            platform: 'OS X 10.9'
+                        }
+                    ],
                     parallel: true,
                     saucelabs: true,
-                    info: false,
-                    debug: false
-                }).done(function(){
-                    done();
-                }, function(err){
-                    done(err);
-                });
-            });
-            it('should succeed TSV test', function (done) {
-                new WdCT({
-                    interaction: 'test/fixture/interaction.js',
-                    testcase: 'test/fixture/testcase.tsv',
-                    browsers: browsers,
-                    parallel: true,
-                    saucelabs: true,
-                    info: false,
-                    debug: false
-                }).done(function(){
-                    done();
-                }, function(err){
-                    done(err);
-                });
-            });
-            it('should succeed xlsx test', function (done) {
-                new WdCT({
-                    interaction: 'test/fixture/interaction.js',
-                    testcase: 'test/fixture/testcase.xlsx',
-                    browsers: browsers,
-                    parallel: true,
-                    saucelabs: true,
-                    info: false,
-                    debug: false
-                }).done(function(){
-                    done();
-                }, function(err){
-                    done(err);
-                });
-            });
-            it('should succeed xls test', function (done) {
-                new WdCT({
-                    interaction: 'test/fixture/interaction.js',
-                    testcase: 'test/fixture/testcase.xls',
-                    browsers: browsers,
-                    parallel: true,
-                    saucelabs: true,
-                    info: false,
-                    debug: false
+                    color: false,
+                    info: 'tmp/info.log',
+                    debug: 'tmp/debug.log'
                 }).done(function(){
                     done();
                 }, function(err){
@@ -126,8 +81,6 @@
                     interaction: 'test/fixture/interaction.js',
                     testcase: 'test/fixture/testcase.csv',
                     browsers: browsers,
-                    parallel: true,
-                    saucelabs: true,
                     infoLogger: {write:infoLogger},
                     debug: false
                 }).done(function(){
@@ -143,8 +96,6 @@
                     interaction: 'test/fixture/interaction.js',
                     testcase: 'test/fixture/testcase.csv',
                     browsers: browsers,
-                    parallel: true,
-                    saucelabs: true,
                     info: false,
                     debugLogger: {write:debugLogger}
                 }).done(function(){
@@ -160,8 +111,6 @@
                     interaction: 'test/fixture/interaction-failed.js',
                     testcase: 'test/fixture/testcase.csv',
                     browsers: browsers,
-                    parallel: true,
-                    saucelabs: true,
                     info: false,
                     debug: false,
                     errorLogger: {write:errorLogger}
@@ -202,8 +151,6 @@
                     interaction: 'test/fixture/interaction-failed.js',
                     testcase: 'test/fixture/testcase.csv',
                     browsers: browsers,
-                    parallel: true,
-                    saucelabs: true,
                     info: false,
                     debug: false,
                     error :false,
@@ -230,8 +177,6 @@
                     interaction: 'test/fixture/interaction-not-enough.js',
                     testcase: 'test/fixture/testcase.xlsx',
                     browsers: browsers,
-                    parallel: true,
-                    saucelabs: true,
                     info: false,
                     debug: false,
                     error: false
@@ -282,8 +227,6 @@
                     interaction: 'test/fixture/interaction.js',
                     testcase: 'test/fixture/testcase.csv',
                     browsers: browsers,
-                    parallel: true,
-                    saucelabs: true,
                     info: false,
                     debug: false,
                     stepwise: true,
@@ -307,7 +250,6 @@
                     interaction: 'test/fixture/interaction-failed.js',
                     testcase: 'test/fixture/testcase.csv',
                     browsers: browsers,
-                    parallel: true,
                     saucelabs: true,
                     info: false,
                     debug: false,
@@ -344,8 +286,6 @@
                     interaction: 'test/fixture/interaction-hooks.js',
                     testcase: 'test/fixture/testcase.csv',
                     browsers: browsers,
-                    parallel: true,
-                    saucelabs: true,
                     info: false,
                     debug: false,
                     promptLogger: promptLogger
@@ -362,8 +302,6 @@
                     interaction: 'test/fixture/interaction.js',
                     testcase: 'test/fixture/testcase-with-numbering.csv',
                     browsers: browsers,
-                    parallel: true,
-                    saucelabs: true,
                     startColumn: 1,
                     info: false,
                     debug: false
@@ -380,8 +318,6 @@
                     interaction: 'test/fixture/interaction.js',
                     testcase: 'test/fixture/testcase.csv',
                     browsers: browsers,
-                    parallel: true,
-                    saucelabs: true,
                     rowNum: 2,
                     infoLogger: {write:infoLogger},
                     debug: false
@@ -401,8 +337,6 @@
                     interaction: 'test/fixture/interaction-failed.js',
                     testcase: 'test/fixture/testcase.csv',
                     browsers: browsers,
-                    parallel: true,
-                    saucelabs: true,
                     info: false,
                     debug: false,
                     errorLogger: {write:errorLogger},
@@ -425,8 +359,6 @@
                     interaction: 'test/fixture/interaction-foo-bar.js',
                     testcase: 'test/fixture/testcase.csv',
                     browsers: browsers,
-                    parallel: true,
-                    saucelabs: true,
                     info: false,
                     debug: false,
                     store: {

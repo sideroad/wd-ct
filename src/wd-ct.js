@@ -117,7 +117,7 @@ var WdCT = function(options){
 
     // Geld colors
     _.map( colors, function(val, key){
-      if( typeof val === 'function' ){
+      if( typeof val === 'function' && !String.prototype.hasOwnProperty(key)){
         Object.defineProperty( String.prototype, key, {
           get: function(){
             return this;
@@ -133,6 +133,7 @@ var WdCT = function(options){
       var promise,
           commands,
           browser,
+          sessionCapabilities,
           wd = require('wd'),
           store = _.extend({}, _store),
           capabilities = typeof browserName === 'string' ? {
@@ -176,7 +177,11 @@ var WdCT = function(options){
                   port: server ? server.port : '80',
                   proxy: options.proxy || {}
                 }
-                ));
+                ))
+                .sessionCapabilities()
+                .then(function(cap){
+                  sessionCapabilities = cap;
+                });
 
       debug(('  Running testcase['+testcase+']').grey);
 
@@ -192,7 +197,7 @@ var WdCT = function(options){
                   promise = promise.then(function(){
                     var err = new Error();
                     err.message = 'Command not exists in script.';
-                    err.col = col;
+                    err.col = col + startColumn;
                     err.command = command;
                     throw err;
                   });
@@ -216,8 +221,7 @@ var WdCT = function(options){
                 });
 
                 promise = promise.fail(function(err){
-                  var filename,
-                      throwError = function(err){
+                  var throwError = function(err){
                         if(!force) {
                           throw err;
                         } else {
@@ -233,19 +237,36 @@ var WdCT = function(options){
                       errorPromise = defer.promise;
 
                   if(!err.col){
-                    err.col = col;
+                    err.col = col + startColumn;
                     err.row = row;
                     err.command = command;
                     err.val = err.val;
                   }
 
                   errorPromise = errorPromise.then(function(){
+                    var basename,
+                        capturefile,
+                        sourcefile;
+
                     if(errorScreenshot) {
-                      filename = path.join( errorScreenshot, + new Date().getTime()+'.png');
-                      return browser.saveScreenshot(filename)
-                                    .then(function(){
+                      basename = [
+                                     sessionCapabilities.platform,
+                                     sessionCapabilities.browserName,
+                                     sessionCapabilities.version,
+                                     col + startColumn,
+                                     row,
+                                     command,
+                                     new Date().getTime()
+                                   ].join('-').replace(/\s/g, '_');
+                      capturefile = path.join( errorScreenshot, basename+'.png');
+                      sourcefile = path.join( errorScreenshot, basename+'.html');
+
+                      return browser.saveScreenshot(capturefile)
+                                    .source()
+                                    .then(function(source){
+                                        fs.writeFileSync(sourcefile, source, 'utf-8');
                                         errorScreenshot = false;
-                                        err.message += ' capture[ '+filename+' ]';
+                                        err.message += ' capture[ '+capturefile+' ] source[ '+sourcefile+' ]';
                                         throwError(err);
                                     });
                     }
@@ -280,18 +301,17 @@ var WdCT = function(options){
               queue('beforeEach', beforeEach, '', null, null);
             }
 
-            data = _.rest(data, startColumn);
             asserts = data[data.length -1];
 
             // queuing input interaction
             header.forEach(function(key, col){
               var val = data[col];
-              queue( key, commands.input[key], val, col + startColumn + 1, row + 2);
+              queue( key, commands.input[key], val, col + 1, row + 2);
             });
 
             // queuing assertion interaction
             asserts.split(/\r?\n\r?\n/).forEach(function(assert){
-              queue( assert, commands.assertion[assert], '', header.length + startColumn + 1, row + 2 );
+              queue( assert, commands.assertion[assert], '', header.length + 1, row + 2 );
             });
 
             if(afterEach) {
@@ -331,12 +351,15 @@ var WdCT = function(options){
 
       if(infoLogger.end){
         infoLogger.end();
+        infoLogger = {write:function(){}};
       }
       if(debugLogger.end){
         debugLogger.end();
+        debugLogger = {write:function(){}};
       }
       if(errorLogger.end){
         errorLogger.end();
+        errorLogger = {write:function(){}};
       }
 
       if(server) {

@@ -18,12 +18,10 @@ module.exports = function (testcase, startColumn, callback){
         header = header.slice(0, last+1);
         body = _.chain( body )
                 .map(function(line){
-                  return findLastIndex(line) === -1 ? false : line.slice(0, last+1);
+                  return findLastIndex(line) === -1 ? false : _.rest( line.slice(0, last+1), startColumn);
                 })
                 .compact().value();
 
-
-        
         // start column index
         header = _.rest(header, startColumn);
 
@@ -56,13 +54,13 @@ module.exports = function (testcase, startColumn, callback){
         // Header should be ignore
         if(row === 0){
           header = _.map(data, function(obj){
-            return obj.value;
+            return String( !obj.value && isNaN(obj.value) ? '' : obj.value );
           });
           return;
         }
 
         body.push( _.map(data, function(obj){
-          return obj.value;
+          return String( !obj.value && isNaN(obj.value) ? '' : obj.value );
         }));
     });
     trimEmpty(null, header, body);
@@ -73,7 +71,11 @@ module.exports = function (testcase, startColumn, callback){
           data = XLS.utils.sheet_to_json( worksheet, {header: 1} );
 
       header = data.shift();
-      body = data;
+      body = _.map(data, function(line){
+        return _.map(line, function(value){
+          return String( !value && isNaN(value) ? '' : value );
+        });
+      });
       trimEmpty(null, header, body);
     })();
   }
