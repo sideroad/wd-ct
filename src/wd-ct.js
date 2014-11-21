@@ -90,12 +90,14 @@ var WdCT = function(options){
              saucelabs === true ? process.env.SAUCE_ACCESS_KEY : saucelabs.accesskey
            ] : 
            undefined;
-  info = options.info ? function(mes){
-    infoLogger.write(mes+'\n');
+  info = options.info ? function(){
+    var args = Array.prototype.slice.call(arguments);
+    infoLogger.write(args.join(' ')+'\n');
   } : function(){};
 
-  debug = options.debug ? function(mes){
-    debugLogger.write(mes+'\n');
+  debug = options.debug ? function(){
+    var args = Array.prototype.slice.call(arguments);
+    debugLogger.write(args.join(' ')+'\n');
   } : function(){};
 
   error = options.error ? function(err){
@@ -146,7 +148,8 @@ var WdCT = function(options){
       chai.should();
       chaiAsPromised.transferPromiseness = wd.transferPromiseness;
 
-      browser = wd.promiseChainRemote.apply( wd, remote? remote : []);
+      browser = wd.promiseChainRemote.apply( wd, capabilities.remote ? capabilities.remote : 
+                                                 remote? remote : []);
       // optional extra logging
       browser.on('status', function(info) {
         debug(info.cyan);
@@ -169,12 +172,11 @@ var WdCT = function(options){
                 capabilities,
 
                 // Saucelabs settings
-                remote ? {
-                  port: 80
-                } : {
-                  port: server.port,
-                  proxy: options.proxy
-                }));
+                {
+                  port: server ? server.port : '80',
+                  proxy: options.proxy || {}
+                }
+                ));
 
       debug(('  Running testcase['+testcase+']').grey);
 

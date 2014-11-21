@@ -10,12 +10,12 @@
         browsers = [
             {
                 browserName: 'internet explorer',
+                platform: 'Windows 7',
                 version: '10',
-                platform: 'Windows 7'
             },
             {
-                browserName: 'Safari',
-                platform: 'Mac'
+                browserName: 'chrome',
+                platform: 'OS X 10.9'
             }
         ];
 
@@ -109,7 +109,6 @@
                     browsers: browsers,
                     parallel: true,
                     saucelabs: true,
-
                     info: false,
                     debug: false
                 }).done(function(){
@@ -122,7 +121,7 @@
 
         describe('logging', function () {
             it('should logging info information', function (done) {
-                var infoLogger = chai.spy(function(){});
+                var infoLogger = chai.spy();
                 new WdCT({
                     interaction: 'test/fixture/interaction.js',
                     testcase: 'test/fixture/testcase.csv',
@@ -139,7 +138,7 @@
                 });
             });
             it('should logging debug information', function (done) {
-                var debugLogger = chai.spy(function(){});
+                var debugLogger = chai.spy();
                 new WdCT({
                     interaction: 'test/fixture/interaction.js',
                     testcase: 'test/fixture/testcase.csv',
@@ -156,7 +155,7 @@
                 });
             });
             it('should logging error information', function (done) {
-                var errorLogger = chai.spy(function(){});
+                var errorLogger = chai.spy();
                 new WdCT({
                     interaction: 'test/fixture/interaction-failed.js',
                     testcase: 'test/fixture/testcase.csv',
@@ -253,10 +252,15 @@
                 new WdCT({
                     interaction: 'test/fixture/interaction-browser-error.js',
                     testcase: 'test/fixture/testcase-browser-error.csv',
-                    browsers: browsers,
+                    // IE could not get browser error
+                    browsers: [
+                        {
+                            browserName: 'chrome',
+                            platform: 'OS X 10.9'
+                        }   
+                    ],
                     parallel: true,
                     saucelabs: true,
-
                     info: false,
                     debug: false,
                     error: false,
@@ -264,7 +268,7 @@
                 }).done(function(){
                     done('should throw error');
                 }, function(err){
-                    err.should.have.property('message').and.equal('http://localhost:8000/site.js 30:10 Uncaught Error: Throw Fantastic Error');
+                    err.should.have.property('message').and.equal('http://localhost:8000/site.js 30:4 Uncaught ReferenceError: NotExistsObject is not defined');
                     done();
                 });
             });
@@ -272,7 +276,7 @@
         });
         describe('execute with breakpoint', function () {
             it('should stop after each commands', function (done) {
-                var promptLogger = chai.spy(function(){});
+                var promptLogger = chai.spy();
 
                 new WdCT({
                     interaction: 'test/fixture/interaction.js',
@@ -286,7 +290,7 @@
                     promptLogger: promptLogger
                 }).then(function(){
                     // prompt should be call 8 times.
-                    promptLogger.should.have.been.called.exactly(8);
+                    promptLogger.should.have.been.called.exactly(8 * browsers.length);
                 }, function(err){
                     throw err;
                 }).done(function(){
@@ -296,8 +300,8 @@
                 });
             });
             it('should stop when error happend', function (done) {
-                var promptLogger = chai.spy(function(){}),
-                    errorLogger = chai.spy(function(){});
+                var promptLogger = chai.spy(),
+                    errorLogger = chai.spy();
 
                 new WdCT({
                     interaction: 'test/fixture/interaction-failed.js',
@@ -334,7 +338,7 @@
         });
         describe('execute with hooks', function () {
             it('should execute with prepared store value', function (done) {
-                var promptLogger = chai.spy(function(){});
+                var promptLogger = chai.spy();
 
                 new WdCT({
                     interaction: 'test/fixture/interaction-hooks.js',
@@ -382,7 +386,7 @@
                     infoLogger: {write:infoLogger},
                     debug: false
                 }).done(function(){
-                    infoLogger.should.have.been.called.exactly(4);
+                    infoLogger.should.have.been.called.exactly(4 * browsers.length);
                     // infoLogger.should.have.been.called.with('should submit text parameter as abcde val[]');
                     done();
                 }, function(err){
@@ -391,7 +395,7 @@
             });
 
             it('should continue test even through error occurred', function (done) {
-                var errorLogger = chai.spy(function(){});
+                var errorLogger = chai.spy();
 
                 new WdCT({
                     interaction: 'test/fixture/interaction-failed.js',
@@ -404,8 +408,7 @@
                     errorLogger: {write:errorLogger},
                     force: true
                 }).then(function(){
-                    // error should be occurred twice.
-                    errorLogger.should.have.been.called.twice;
+                    errorLogger.should.have.been.called.exactly(2 * browsers.length);
                 }, function(err){
                     throw err;
                 }).done(function(){
@@ -416,7 +419,7 @@
             });
 
             it('should execute with prepared store value', function (done) {
-                var promptLogger = chai.spy(function(){});
+                var promptLogger = chai.spy();
 
                 new WdCT({
                     interaction: 'test/fixture/interaction-foo-bar.js',
