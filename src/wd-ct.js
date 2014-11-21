@@ -166,22 +166,29 @@ var WdCT = function(options){
                 // Default settings
                 {
                   hostname: '127.0.0.1',
-                  name: testcase
+                  name: testcase,
+                  build: options.build,
+                  tags: options.tags || [],
+                  proxy: options.proxy || {}
                 },
 
                 // Browser settings
                 capabilities,
 
-                // Saucelabs settings
+                // Server settings
                 {
-                  port: server ? server.port : '80',
-                  proxy: options.proxy || {}
+                  port: server ? server.port : '80'
                 }
                 ))
                 .sessionCapabilities()
                 .then(function(cap){
                   sessionCapabilities = cap;
                 });
+
+      if(saucelabs){
+        promise = promise.sauceJobUpdate({
+        });
+      }
 
       debug(('  Running testcase['+testcase+']').grey);
 

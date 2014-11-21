@@ -64,6 +64,7 @@
     "grunt-contrib-clean": "^0.6.0",
     "grunt-contrib-jshint": "^0.10.0",
     "grunt-mocha-cov": "^0.3.0",
+    "grunt-release": "^0.7.0",
     "mocha": "^1.21.4"
   },
   "peerDependencies": {},

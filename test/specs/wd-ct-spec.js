@@ -8,7 +8,8 @@
         prompt = require('prompt'),
         site,
         fs = require('fs'),
-        browsers = ['firefox'];
+        browsers = ['firefox'],
+        build = new Date().getTime();
 
     chai.use(spies);
     chai.should();
@@ -64,7 +65,8 @@
                     parallel: true,
                     saucelabs: true,
                     info: false,
-                    debug: false
+                    debug: false,
+                    build: build
                 }).done(function(){
                     done();
                 }, function(err){
