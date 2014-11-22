@@ -1,0 +1,4 @@
+open,click error button,assert,
+http://localhost:8000/index-invalid-markup.html,,should submit text parameter as abcde,
+http://localhost:8000/index-invalid-markup.html,,should submit text parameter as 12345,
+,,,

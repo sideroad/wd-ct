@@ -34,6 +34,47 @@
 
     describe('addPromiseChainMethod', function () {
 
+        describe('getMarkupWarning', function(){
+            var store = {},
+                wd = require('wd');
+
+            wdExtension.adapt(wd, store, function(){});
+            it('should get HTML markup error', function (done) {
+                var b = wd.promiseChainRemote("ondemand.saucelabs.com", 80, process.env.SAUCE_USERNAME, process.env.SAUCE_ACCESS_KEY);
+                b.init({
+                    browserName: 'internet explorer',
+                    version: '8',
+                    'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
+                 })
+                 .get('http://localhost:8000/')
+                 .getMarkupWarning()
+                 .then(function(warnings){
+                    warnings.should.have.length(0);
+                 })
+                 .get('http://localhost:8000/index-invalid-markup.html')
+                 .getMarkupWarning()
+                 .then(function(warnings){
+                    warnings.should.have.length(6);
+                    warnings.should.deep.equal([
+                        'line 7 column 4 - Warning: missing </span> before </p>',
+                        'line 8 column 4 - Warning: inserting implicit <span>',
+                        'line 8 column 22 - Warning: inserting implicit <p>',
+                        'line 10 column 5 - Warning: inserting implicit <span>',
+                        'line 10 column 14 - Warning: missing <li>',
+                        'line 10 column 14 - Warning: inserting implicit <span>'
+                    ]);
+                 })
+                 .then(function(){
+                    return b.quit();
+                 })
+                 .done(function(){
+                    done();
+                 }, function(err){
+                    done(err);
+                 });
+            });
+        });
+
         describe('getBrowserErrors', function () {
             var store = {},
                 wd = require('wd');
@@ -43,7 +84,8 @@
             it('should get browser error', function (done) {
                 var b = wd.promiseChainRemote("ondemand.saucelabs.com", 80, process.env.SAUCE_USERNAME, process.env.SAUCE_ACCESS_KEY);
                 b.init({
-                    browserName: 'chrome'
+                    browserName: 'chrome',
+                    'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
                  })
                  .get('http://localhost:8000/')
                  .getBrowserErrors()
@@ -68,7 +110,8 @@
             it('should output log for unsupported warnings on IE', function (done) {
                 var b = wd.promiseChainRemote("ondemand.saucelabs.com", 80, process.env.SAUCE_USERNAME, process.env.SAUCE_ACCESS_KEY );
                 b.init({
-                    browserName: 'internet explorer'
+                    browserName: 'internet explorer',
+                    'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
                  })
                  .get('http://localhost:8000/')
                  .getBrowserErrors()

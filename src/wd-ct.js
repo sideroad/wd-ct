@@ -40,7 +40,8 @@ var WdCT = function(options){
       saucelabs,
       remote,
       parallel,
-      validBrowserError,
+      validateBrowserError,
+      validateMarkupWarning,
       wdCtDefer = Q.defer(),
       _store;
 
@@ -66,7 +67,8 @@ var WdCT = function(options){
     parallel: false,
     rowNum: undefined,
     saucelabs: undefined,
-    validBrowserError: false
+    validateBrowserError: false,
+    validateMarkupWarning: false
   }, options);
 
   _store = _.extend({}, options.store);
@@ -112,7 +114,8 @@ var WdCT = function(options){
 
     errorLogger.write(mes+'\n');
   } : function(){};
-  validBrowserError = options.validBrowserError;
+  validateBrowserError = options.validateBrowserError;
+  validateMarkupWarning = options.validateMarkupWarning;
 
   // Apply colors to console.log
   var colors = require('colors');
@@ -221,14 +224,28 @@ var WdCT = function(options){
                 promise = promise.then(function(){
                   info(command + ' val['+val+']');
                   var dfd = fn.apply( browser, [val, store]);
-                  if(validBrowserError) {
+                  if(validateBrowserError) {
                     dfd = dfd.then(function(){
                       return browser.getBrowserErrors().then(function(errs){
                         if(errs.length){
-                          throw new Error(errs);
+                          throw new Error(errs.join('\n'));
                         }
                         return this;
                       });
+                    }, function(err){
+                      throw err;
+                    });
+                  }
+                  if(validateMarkupWarning) {
+                    dfd = dfd.then(function(){
+                      return browser.getMarkupWarning().then(function(errs){
+                        if(errs.length){
+                          throw new Error(errs.join('\n'));
+                        }
+                        return this;
+                      });
+                    }, function(err){
+                      throw err;
                     });
                   }
                   return dfd.then(function(){
@@ -247,9 +264,9 @@ var WdCT = function(options){
                         col: col,
                         row: row,
                         err: err,
-                        cap: sessionCapabilities
+                        cap: sessionCapabilities,
+                        bailout: !force
                       });
-
                       throw err;
                     }
                   );

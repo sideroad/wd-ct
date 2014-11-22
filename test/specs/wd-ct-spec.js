@@ -55,10 +55,12 @@
                             browserName: 'internet explorer',
                             platform: 'Windows 7',
                             version: '10',
+                            'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
                         },
                         {
                             browserName: 'chrome',
-                            platform: 'OS X 10.9'
+                            platform: 'OS X 10.9',
+                            'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
                         }
                     ],
                     parallel: true,
@@ -200,7 +202,8 @@
                     browsers: [
                         {
                             browserName: 'chrome',
-                            platform: 'OS X 10.9'
+                            platform: 'OS X 10.9',
+                            'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
                         }   
                     ],
                     parallel: true,
@@ -208,11 +211,41 @@
                     info: false,
                     debug: false,
                     error: false,
-                    validBrowserError: true
+                    validateBrowserError: true
                 }).done(function(){
                     done('should throw error');
                 }, function(err){
                     err.should.have.property('message').and.equal('http://localhost:8000/site.js 30:4 Uncaught ReferenceError: NotExistsObject is not defined');
+                    done();
+                });
+            });
+
+            it('should throw error when markup is not correct', function (done) {
+                new WdCT({
+                    interaction: 'test/fixture/interaction-markup-warning.js',
+                    testcase: 'test/fixture/testcase-markup-warning.csv',
+                    browsers: [
+                        {
+                            browserName: 'internet explorer',
+                            version: '8',
+                            'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
+                        }   
+                    ],
+                    parallel: true,
+                    saucelabs: true,
+                    info: false,
+                    debug: false,
+                    error: false,
+                    validateMarkupWarning: true
+                }).done(function(){
+                    done('should throw error');
+                }, function(err){
+                    err.should.have.property('message').and.equal('line 7 column 4 - Warning: missing </span> before </p>\n'+
+                                                                  'line 8 column 4 - Warning: inserting implicit <span>\n'+
+                                                                  'line 8 column 22 - Warning: inserting implicit <p>\n'+
+                                                                  'line 10 column 5 - Warning: inserting implicit <span>\n'+
+                                                                  'line 10 column 14 - Warning: missing <li>\n'+
+                                                                  'line 10 column 14 - Warning: inserting implicit <span>');
                     done();
                 });
             });

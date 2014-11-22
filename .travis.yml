@@ -5,6 +5,9 @@ before_install:
   - "npm -g install grunt-cli"
   - "export DISPLAY=:99.0"
   - "sh -e /etc/init.d/xvfb start"
+  - sleep 3 # give xvfb some time to start
+  - rackup  # start a Web server
+  - sleep 3 # give Web server some time to bind to sockets, etc
 env:
   global:
   - secure: hVBiriEbSWpQp7LytBp4qHyu3+YBeJC8qkkmLaI1Un2e6yFY6p+bc73K8MM4lLlTIJ5Bt4GNimb3ipm7kwo5G7IBV+fOtKE0gtCDV/Doj1sKKjmAy5K6gvv1Ais1bcERxLK1r3f8MakPYoUw/uSNjHcp7v0nCTnLcz5stD3QPKM=

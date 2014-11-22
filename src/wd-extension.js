@@ -6,7 +6,8 @@ module.exports = {
         Q = require('q'),
         prompt = require('prompt'),
         fire = fs.readFileSync( path.join( __dirname, 'browser/fire.js'), 'utf8').toString(),
-        select = fs.readFileSync( path.join( __dirname, 'browser/select.js'), 'utf8').toString();
+        select = fs.readFileSync( path.join( __dirname, 'browser/select.js'), 'utf8').toString(),
+        tidy = require('htmltidy').tidy;
 
     prompt.message = '';
     prompt.delimiter = '';
@@ -101,6 +102,22 @@ module.exports = {
       'waitForNoElement',
       function(selector){
         return this.waitForConditionInBrowser('!document.querySelectorAll('+selector+').length ? true : false', 10000, 1000);
+      }
+    );
+
+    wd.addPromiseChainMethod(
+      'getMarkupWarning',
+      function(reg){
+        reg = reg || /(line \d+ column \d+ - (Warning: missing <\w+>|Warning: inserting implicit <\w+>|Warning: missing <\/\w+> before <\/\w+>))/g;
+
+        return this.source()
+                   .then(function(src){
+                     var dfd = Q.defer();
+                     tidy(src, {showWarnings: true}, function(warnings){
+                       dfd.resolve(warnings.match(reg) || []);
+                     });
+                     return dfd.promise;
+                   });
       }
     );
 
