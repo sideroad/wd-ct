@@ -275,6 +275,7 @@ var WdCT = function(options){
                 promise = promise.fail(function(err){
                   var throwError = function(err){
                         if(!force) {
+                          errorScreenshot = false;
                           throw err;
                         } else {
                           error(err);
@@ -317,12 +318,12 @@ var WdCT = function(options){
                                     .source()
                                     .then(function(source){
                                         fs.writeFileSync(sourcefile, source, 'utf-8');
-                                        errorScreenshot = false;
                                         err.message += ' capture[ '+capturefile+' ] source[ '+sourcefile+' ]';
                                         throwError(err);
                                     });
+                    } else {
+                      throwError(err);
                     }
-                    throwError(err);
                   });
                   defer.resolve();
                   return errorPromise;
