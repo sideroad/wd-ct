@@ -101,7 +101,7 @@ module.exports = {
     wd.addPromiseChainMethod(
       'waitForNoElement',
       function(selector){
-        return this.waitForConditionInBrowser('!document.querySelectorAll('+selector+').length ? true : false', 10000, 1000);
+        return this.waitForConditionInBrowser('!document.querySelectorAll("'+selector+'").length ? true : false', 10000, 1000);
       }
     );
 
