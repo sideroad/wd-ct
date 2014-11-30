@@ -147,6 +147,31 @@
 
         describe('exception handling', function () {
 
+            it('should fail when return with non-promise value', function (done) {
+                new WdCT({
+                    interaction: 'test/fixture/interaction-promise-error.js',
+                    testcase: 'test/fixture/testcase.csv',
+                    browsers: browsers,
+                    info: false,
+                    debug: false,
+                    error :false,
+                    errorScreenshot: 'tmp'
+                }).then(function(){
+                    throw new Error('should fail');
+                }, function(err){
+                    var expected = new RegExp("input or assertion should be return with Promise object");
+                    err.should.have.property('message').to.match(expected);
+                    err.should.have.property('col').and.equal(2);
+                    err.should.have.property('row').and.equal(2);
+                    err.should.have.property('command').and.equal('input text');
+
+                }).done(function(){
+                    done();
+                }, function(err){
+                    done(err);
+                });
+                
+            });
             it('should fail and interrupted', function (done) {
                 new WdCT({
                     interaction: 'test/fixture/interaction-failed.js',

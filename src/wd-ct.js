@@ -224,6 +224,10 @@ var WdCT = function(options){
                 promise = promise.then(function(){
                   info(command + ' val['+val+']');
                   var dfd = fn.apply( browser, [val, store]);
+
+                  if( !Q.isPromiseAlike(dfd) ){
+                    throw new Error("input or assertion should be return with Promise object");
+                  }
                   if(validateBrowserError) {
                     dfd = dfd.then(function(){
                       return browser.getBrowserErrors().then(function(errs){
