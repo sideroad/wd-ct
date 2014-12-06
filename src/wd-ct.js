@@ -310,9 +310,9 @@ var WdCT = function(options){
                                      sessionCapabilities.platform,
                                      sessionCapabilities.browserName,
                                      sessionCapabilities.version,
-                                     col + startColumn,
-                                     row,
-                                     command,
+                                     err.col,
+                                     err.row,
+                                     err.command,
                                      new Date().getTime()
                                    ].join('-').replace(/\s/g, '_');
                       capturefile = path.join( errorScreenshot, basename+'.png');

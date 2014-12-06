@@ -8,7 +8,16 @@
         prompt = require('prompt'),
         site,
         fs = require('fs'),
-        browsers = ['firefox'],
+        browsers = ['firefox',
+                        {
+                            browserName: 'safari',
+                              'appium-version': '1.3',
+                              platformName: 'iOS',
+                              platformVersion: '8.1',
+                              deviceName: 'iPhone Simulator',
+                              app: undefined,
+                            remote: ['localhost', '4723']
+                        }],
         build = new Date().getTime();
 
     chai.use(spies);
@@ -61,6 +70,13 @@
                             browserName: 'chrome',
                             platform: 'OS X 10.9',
                             'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
+                        },
+                        {
+                            platform: 'Mac 10.9',
+                            browserName: 'iphone',
+                            version: '8.1',
+                            deviceName: 'iPhone Simulator',
+                            'device-orientation': 'portrait'
                         }
                     ],
                     parallel: true,
