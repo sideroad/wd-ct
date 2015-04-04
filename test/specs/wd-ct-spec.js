@@ -8,16 +8,7 @@
         prompt = require('prompt'),
         site,
         fs = require('fs'),
-        browsers = ['firefox',
-                        {
-                            browserName: 'safari',
-                              'appium-version': '1.3',
-                              platformName: 'iOS',
-                              platformVersion: '8.1',
-                              deviceName: 'iPhone Simulator',
-                              app: undefined,
-                            remote: ['localhost', '4723']
-                        }],
+        browsers = ['firefox'],
         build = new Date().getTime();
 
     chai.use(spies);
