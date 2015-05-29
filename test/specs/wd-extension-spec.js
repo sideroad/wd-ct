@@ -75,6 +75,57 @@
             });
         });
 
+        describe('$', function(){
+            var store = {},
+                wd = require('wd');
+
+            wdExtension.adapt(wd, store, function(){});
+            it('should get element', function (done) {
+                var b = wd.promiseChainRemote("ondemand.saucelabs.com", 80, process.env.SAUCE_USERNAME, process.env.SAUCE_ACCESS_KEY);
+                b.init({
+                    browserName: 'firefox',
+                 })
+                 .get('http://localhost:8000/')
+                 .$('#button')
+                 .getValue()
+                 .then(function(value){
+                    value.should.equal('Button');
+                    return b.quit();
+                 })
+                 .done(function(){
+                    done();
+                 }, function(err){
+                    done(err);
+                 });
+            });
+        });
+
+        describe('$dl', function(){
+            var store = {},
+                wd = require('wd');
+
+            wdExtension.adapt(wd, store, function(){});
+            it('should get element by data-locate', function (done) {
+                var b = wd.promiseChainRemote("ondemand.saucelabs.com", 80, process.env.SAUCE_USERNAME, process.env.SAUCE_ACCESS_KEY);
+                b.init({
+                    browserName: 'firefox',
+                 })
+                 .get('http://localhost:8000/')
+                 .$dl('dataLocate')
+                 .getValue()
+                 .then(function(value){
+                    value.should.equal('dataLocate');
+                    return b.quit();
+                 })
+                 .done(function(){
+                    done();
+                 }, function(err){
+                    done(err);
+                 });
+            });
+        });
+
+
         describe('getBrowserErrors', function () {
             var store = {},
                 wd = require('wd');

@@ -106,6 +106,20 @@ module.exports = {
     );
 
     wd.addPromiseChainMethod(
+      '$',
+      function(selector){
+        return this.elementByCss(selector);
+      }
+    );
+
+    wd.addPromiseChainMethod(
+      '$dl',
+      function(selector){
+        return this.elementByCss('[data-locate="'+selector+'"]');
+      }
+    );
+
+    wd.addPromiseChainMethod(
       'getMarkupWarning',
       function(reg){
         reg = reg || /(line \d+ column \d+ - (Warning: missing <\w+>|Warning: inserting implicit <\w+>|Warning: missing <\/\w+> before <\/\w+>))/g;

@@ -1,7 +1,7 @@
 {
   "name": "wd-ct",
   "description": "Run WebDriver for combinatorial testing",
-  "version": "4.0.7",
+  "version": "4.0.8",
   "homepage": "https://github.com/sideroad/wd-ct",
   "author": {
     "name": "sideroad",
@@ -55,7 +55,7 @@
     "prompt": "^0.2.13",
     "q": "1.1.2",
     "simple-spawn": "0.0.2",
-    "wd": "^0.3.11",
+    "wd": "^0.3.12",
     "xlsjs": "^0.7.1"
   },
   "devDependencies": {
