@@ -331,6 +331,36 @@
             });
         });
 
+        describe('val', function () {
+            var store = {},
+                wd = require('wd');
+
+            wdExtension.adapt(wd, store, function(){});
+
+            it('should get value from element', function (done) {
+                var b = wd.promiseChainRemote();
+                b.init({
+                    browserName: 'firefox'
+                 })
+                 .get('http://localhost:8000/')
+                 .$('#text')
+                 .type('abcde')
+                 .$('#text')
+                 .val()
+                 .then(function(text){
+                    text.should.equal('abcde');
+                 })
+                 .then(function(){
+                    return b.quit();
+                 })
+                 .done(function(){
+                    done();
+                 }, function(err){
+                    done(err);
+                 });
+            });
+        });
+
         describe('naturalType', function () {
             var store = {},
                 wd = require('wd');

@@ -23,6 +23,15 @@ module.exports = {
                    });
       }
     );
+
+    // adding custom promise chain method
+    wd.addElementPromiseChainMethod(
+      'val',
+      function(eventName) {
+        return this.getValue();
+      }
+    );
+
     // adding custom promise chain method
     wd.addElementPromiseChainMethod(
       'naturalType',

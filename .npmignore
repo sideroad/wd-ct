@@ -1,4 +1,8 @@
 .DS_Store
 tmp
 test
+.travis.yml
+template
+examples
+docs
 .yo-rc.json
