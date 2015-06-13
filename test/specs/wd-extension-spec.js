@@ -3,12 +3,12 @@
 (function () {
     'use strict';
 
-    var SeleniumServer = require('../../src/setup-server'),
-     	chai = require('chai'),
+    var chai = require('chai'),
         spies = require('chai-spies'),
         prompt = require('prompt'),
+        selenium = require('selenium-standalone'),
+        server,
         wdExtension = require('../../src/wd-extension'),
-     	server,
         site;
 
     chai.use(spies);
@@ -19,17 +19,26 @@
         prompt.override = {
             breakpoint: ' '
         };
-        server = new SeleniumServer();
-        server.on('start', function(){
 
-            var Site = require('../helpers/setup-site');
-            site = new Site();
-            done();
+        selenium.install(function(){
+            selenium.start(function(err, _server){
+                server = _server;
+                var Site = require('../helpers/setup-site');
+                new Site(function(_site){
+                    site = _site;
+                    done();
+                });
+            });
         });
+
     });
     after(function(done){
+        server.on('exit', function(){
+            site.close(function(){
+                done();
+            });
+        });
         server.kill();
-        done();
     });
 
     describe('addPromiseChainMethod', function () {

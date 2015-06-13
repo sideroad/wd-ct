@@ -1,17 +1,12 @@
-module.exports = function(){
-    var express = require('express'),
-      http = require('http'),
+module.exports = function(callback){
+  var express = require('express'),
       app = express(),
       server,
       port = 8000;
 
-  server = http.createServer(app).listen(port);
-  server.on('error', function(err){
-    if(err.code !== 'EADDRINUSE') {
-      throw err;
-    }
+  server = app.listen(port,function(){
+    callback(server);
   });
   
   app.use(express.static(__dirname + "/../fixture/site")); //use static files in ROOT/public folder
-	return server;
 };
