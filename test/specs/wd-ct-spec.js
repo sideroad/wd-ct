@@ -1,4 +1,4 @@
-/* global describe, it, before */
+/* global describe, it, before, after */
 
 (function () {
     'use strict';
@@ -18,13 +18,19 @@
 
         before(function(done){
             var Site = require('../helpers/setup-site');
-            site = new Site();
-
             prompt.override = {
                 breakpoint: ' '
             };
+            new Site(function(_site){
+                site = _site;
+                done();
+            });
+        });
 
-            done();
+        after(function(done){
+            site.close(function(){
+                done();
+            });
         });
 
         var WdCT = require('../../src/wd-ct');
@@ -37,7 +43,7 @@
                     browsers: browsers,
                     info: false,
                     debug: false
-                }).done(function(){
+                }).done(function(err){
                     done();
                 }, function(err){
                     done(err);
@@ -61,13 +67,6 @@
                             browserName: 'chrome',
                             platform: 'OS X 10.9',
                             'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
-                        },
-                        {
-                            platform: 'Mac 10.9',
-                            browserName: 'iphone',
-                            version: '8.1',
-                            deviceName: 'iPhone Simulator',
-                            'device-orientation': 'portrait'
                         }
                     ],
                     parallel: true,

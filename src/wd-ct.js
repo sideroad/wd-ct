@@ -15,7 +15,7 @@ var async = require('async'),
     Q = require('q'),
     path = require('path'),
     fs = require('fs'),
-    SeleniumServer = require('./setup-server'),
+    selenium = require('selenium-standalone'),
     loadTestcase = require('./load-testcase'),
     wdExtension = require('./wd-extension');
 
@@ -25,7 +25,6 @@ var WdCT = function(options){
       error,
       reporter,
       testcase,
-      server,
       interaction,
       stepwise,
       startColumn,
@@ -132,7 +131,7 @@ var WdCT = function(options){
     });
   }
 
-  var executeWd = function(){
+  var executeWd = function(server){
 
     (parallel ? async.each : async.mapSeries).call( async, options.browsers, function(browserName, callback){
       var promise,
@@ -458,12 +457,20 @@ var WdCT = function(options){
       }
 
       if(server) {
+        server.on('exit', function(){
+          if(err){
+            wdCtDefer.reject(err);
+          } else {
+            wdCtDefer.resolve();
+          }
+        });
         server.kill();
-      }
-      if(err){
-        wdCtDefer.reject(err);
       } else {
-        wdCtDefer.resolve();
+        if(err){
+          wdCtDefer.reject(err);
+        } else {
+          wdCtDefer.resolve();
+        }        
       }
     });
   };
@@ -472,12 +479,14 @@ var WdCT = function(options){
   if(!remote) {
     debug('Setup Selenium Server...'.grey);
 
-    server = new SeleniumServer();
-    server.on('data', function(data){
-      debug(data.grey);
+    selenium.install(function(err){
+      selenium.start(function(err, server){
+        server.stderr.on('data', function(data){
+          debug(data.grey);
+        });
+        executeWd(server);
+      });
     });
-
-    server.on('start', executeWd);
   } else {
     executeWd();
   }
